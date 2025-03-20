@@ -319,3 +319,83 @@ images_pt #Output would be tensor([[[[0., 0., 0.],
 - ![alt text](image-38.png)
 
 ## Common Tensor Operations
+- Here we will do the following operations:
+- ![alt text](image-39.png)
+
+### Tensor Transposition
+- ![alt text](image-40.png)
+- ![alt text](image-41.png)
+
+### Basic Tensor Arithmetic(including Hadamard Product)
+- ![alt text](image-43.png)
+- ![alt text](image-42.png)
+- ![alt text](image-44.png)
+- If two tensors have the same size, operations are often by default applied element-wise. This is not **matrix multiplication**, but is rather called the **Hadamard product** or simply the **element-wise product**.
+- The mathematical notation is  A⊙X
+- ![alt text](image-45.png)
+
+### Tensor Reduction
+- Calculating the sum across all elements of a tensor is a common operation. For example:
+- ![alt text](image-46.png)
+- ![alt text](image-47.png)
+- We can do the sum in a 2D tensor along rows and columns also like this 
+- ![alt text](image-48.png)
+- Many other operations can be applied with reduction along all or a selection of axes, e.g.:
+- maximum
+- minimum
+- mean
+- product
+- They're fairly straightforward and used less often than summation
+
+## Dot Product of 2 Vectors
+- ![alt text](image-49.png)
+- The dot product is ubiquitous in deep learning: It is performed at every artificial neuron in a deep neural network, which may be made up of millions (or orders of magnitude more) of these neurons.
+- ![alt text](image-50.png)
+- Use it in PyTorch like this 
+- ![alt text](image-51.png)
+- Use it in TensorFlow like this
+- ![alt text](image-52.png)
+- ![alt text](image-53.png)
+- ![alt text](image-54.png)
+
+## Solving Linear Systems with Substitution
+-  We can use matrices to solve some simple linear systems computationally i.e using code.
+-  ![alt text](image-55.png)
+-  ![alt text](image-56.png)
+-  ![alt text](image-57.png)
+
+## Solving Linear Systems with Elimination
+- ![alt text](image-58.png)
+- ![alt text](image-59.png)
+- ![alt text](image-60.png)
+- ![alt text](image-61.png)
+```python
+x = np.linspace(-10, 10, 1000) # start, finish, n points
+y1 = -5 + (2*x)/3
+y2 = (7-2*x)/5
+fig, ax = plt.subplots()
+plt.xlabel('x')
+plt.ylabel('y')
+
+# Add x and y axes:
+plt.axvline(x=0, color='lightgray')
+plt.axhline(y=0, color='lightgray')
+
+ax.set_xlim([-2, 10])
+ax.set_ylim([-6, 4])
+ax.plot(x, y1, c='green')
+ax.plot(x, y2, c='brown')
+plt.axvline(x=6, color='purple', linestyle='--')
+_ = plt.axhline(y=-1, color='purple', linestyle='--')
+
+```
+- ![alt text](image-62.png)
+
+
+## Matrix Properties
+- We will look at the following items:
+- ![alt text](image-63.png)
+
+### Frobenius Norm
+- It is a function that enables us to quantify the size of a matrix.
+- 
