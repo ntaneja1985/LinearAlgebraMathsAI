@@ -186,4 +186,136 @@ x_pt #Output is tensor([25,  2,  5])
 ```
 
 ### Please note that Vectors not only represent a point in space but can also represent a magnitude and direction in space
+- Remember vectors represent a point in space like this
+- ![alt text](image-11.png)
+- We can also think of them as representing direction and magnitude like this 
+- ![alt text](image-14.png)
+- Norms are a class of functions that quantify the vector magnitude(or its length)
+- They describe the distance from the origin(say (0,0,0))
+- Most common is L2 norm
+- We take each element in our vector, square them and then add them and then take their square root 
+- ![alt text](image-15.png)
+- This L2 norm measures the simple (euclidean) distance from origin(looks like pythogoras theorem)
+- It is the most common norm in machine learning 
+- ![alt text](image-16.png)
+```python
+x # Output is [25,2,5]
+(25**2 + 2**2 + 5**2)**(1/2) # Output is 25.573423705088842
 
+# Get the norm
+np.linalg.norm(x) #Output is np.float64(25.573423705088842)
+
+```
+- So, if units in this 3-dimensional vector space are meters, then the vector  x  has a length of 25.6m
+
+### Unit Vectors 
+- Special case where its length or L2 norm is equal to 1 
+- Technically, x is a unit vector with unit norm i.e ||**x**|| = 1
+- ![alt text](image-17.png)
+- There are other norms also
+
+### L1 norm
+- ![alt text](image-18.png)
+- Common norm in ML
+- Varies linearly at all locations whether near or far from origin
+- Used whenever difference between zero and non zero is the key
+```python
+x # Output is []
+np.abs(25) + np.abs(2) + np.abs(5) #Output is 32
+
+```
+### Squared L^2 norm
+- ![alt text](image-19.png)
+- Here it is same as L2 norm but we dont use the square root 
+- ![alt text](image-21.png)
+```python
+x #Output is [25,2,5]
+
+(25**2 + 2**2 + 5**2) #Output is 654
+
+# we'll cover tensor multiplication more soon but to prove point quickly:
+np.dot(x, x) #Output is 654 (This is x * transpose(x))
+
+```
+
+### Max Norm(or L(infinity) norm)
+- ![alt text](image-22.png)
+- ![alt text](image-23.png)
+```python
+np.max([np.abs(25), np.abs(2), np.abs(5)]) #Output is 25
+
+```
+
+### Generalized Lp norm
+- ![alt text](image-24.png)
+- ![alt text](image-26.png)
+
+
+## Basis, Orthogonal and Orthonormal Vectors
+- Basis vectors can be scaled to represent any vector in a given vector space
+- Typically use unit vectors along axes of vector space(shown)
+- ![alt text](image-27.png)
+
+### Orthogonal Vectors
+- x and y are orthogonal vectors if x^t * y = 0
+- It means vectors are 90 degree angle to each other 
+- ![alt text](image-28.png)
+
+### Orthonormal vectors 
+- Orthonormal vectors are orthogonal and all have unit norm
+- Basis vectors are an example
+- ![alt text](image-29.png)
+```python
+i = np.array([1, 0])
+i #Output is [1,0]
+
+j = np.array([0, 1])
+j #Output is [0,1]
+
+np.dot(i, j) #Output is 0
+
+```
+
+## 2-Dimensional Tensors(also called Matrices)
+- Matrix is a 2 dimensional array of numbers 
+- ![alt text](image-30.png)
+- Denoted in uppercase, italics and bold 
+- If Matrix X has 3 rows and 2 columns, its shape is (3,2)
+- Individual scalar elements are denoted in uppercase, italics only 
+- ![alt text](image-31.png)
+- Matrices in NumPy
+- ![alt text](image-32.png)
+- ![alt text](image-35.png)
+- Matrices in PyTorch
+- ![alt text](image-33.png)
+- Matrices in TensorFlow 
+- ![alt text](image-34.png)
+
+## Generic Tensor Notation
+- We can generalize our notation to be able to represent tensors with any number of dimensions, including the high dimensional tensors that are common behind the scenes in machine learning models.
+- ![alt text](image-36.png)
+- As an example, rank 4 tensors are common for images, where each dimension corresponds to:
+- Number of images in training batch, e.g., 32
+- Image height in pixels, e.g., 28 for MNIST digits
+- Image width in pixels, e.g., 28
+- Number of color channels, e.g., 3 for full-color images (RGB)
+```python
+images_pt = torch.zeros([32, 28, 28, 3]) #Create a 4D tensor with these sizes
+images_pt #Output would be tensor([[[[0., 0., 0.],
+          #[0., 0., 0.],
+          #[0., 0., 0.],
+          #...,
+          #[0., 0., 0.],
+          #[0., 0., 0.],
+          #[0., 0., 0.]],
+
+         #[[0., 0., 0.],
+          #[0., 0., 0.],
+          #[0., 0., 0.],
+          #...,
+
+```
+- ![alt text](image-37.png)
+- ![alt text](image-38.png)
+
+## Common Tensor Operations
