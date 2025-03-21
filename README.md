@@ -398,4 +398,94 @@ _ = plt.axhline(y=-1, color='purple', linestyle='--')
 
 ### Frobenius Norm
 - It is a function that enables us to quantify the size of a matrix.
-- 
+- ![alt text](image-65.png)
+- ![alt text](image-66.png)
+
+### Matrix Multiplication
+- Most widely used operation in Machine Learning
+- First rule is that if we are multiplying 2 matrices, then number of columns in the first matrix should be equal to the number of rows in the second matrix.
+- When we multiply the above 2 matrices, we get a new matrix where number of rows is equal to the rows of the first matrix and number of columns is equal to the number of columns in the second matrix. 
+- ![alt text](image-67.png)
+- ![alt text](image-69.png)
+- ![alt text](image-85.png)
+- ![alt text](image-70.png)
+- In Pytorch we can do it like this 
+- ![alt text](image-71.png)
+- In Tensor flow we can do it like this 
+- ![alt text](image-72.png)
+- ![alt text](image-73.png)
+- ![alt text](image-74.png)
+- Note that AB <> BA
+- ![alt text](image-75.png)
+- We can do it in PyTorch as follows:
+- ![alt text](image-76.png)
+- Remember this algorithm where we were trying to predict the price of a house 
+- ![alt text](image-77.png)
+- Note that we have a set of data points to train this regression model 
+- Note that every row represents a specific house.
+- We can represent this in matrix form like this 
+- ![alt text](image-78.png)
+
+### Symmetry and Identity Matrices
+- Symmetric is a special kind of matrix which has following properties
+- It should be square
+- Its transpose should be equal to the matrix itself
+- ![alt text](image-79.png)
+- ![alt text](image-80.png)
+- Identity Matrix is a symmetric matrix where every element along diagonal is 1
+- All other elements are 0
+- ![alt text](image-81.png)
+- ![alt text](image-82.png)
+- Take an n length vector and multiply it by the identity matrix then it remains unchanged.
+- ![alt text](image-83.png)
+- ![alt text](image-84.png)
+
+### Matrix Inversion
+- It is clever convenient approach for solving linear equations
+- An alternative to manually solving with substitution or elimination
+- Matrix inverse of X is denoted as X^-1
+- Multiplying a matrix by its inverse results in the identity matrix
+- ![alt text](image-86.png)
+- Remember the house prices example
+- ![alt text](image-87.png)
+- ![alt text](image-88.png)
+- ![alt text](image-89.png)
+- ![alt text](image-90.png)
+- ![alt text](image-91.png)
+- There are limitations to applying Matrix inversions 
+- ![alt text](image-92.png)
+- Note that columns should not be multiples of other columns
+- Another problem with Matrix inversion is that it can only be calculated if the matrix is a square i.e its rows and cols are the same. 
+- ![alt text](image-93.png)
+- ![alt text](image-94.png)
+- Note that -4,-8 is a multiple of 1,2, so its a singular matrix so we cannot calculate its inverse.
+- Similarly if we try to invert a non-square matrix, then we get an error also.
+
+### Diagonal Matrix
+- Has non-zero elements along main diagonal; zeros everywhere
+- Identity matrix is an example of a diagonal matrix, its a special type of diagonal matrix.
+- ![alt text](image-95.png)
+
+### Orthogonal Matrix
+- Recall orthonormal vectors from earlier, i.e vectors which are perpendicular to each other. Doing their dot products results in 0. Basis vectors were an example
+- ![alt text](image-96.png)
+- ![alt text](image-98.png)
+- ![alt text](image-99.png)
+- ![alt text](image-100.png)
+- Note that that the rows and columns are orthonormal, i.e they have unit norm(size is 1) and doing their dot product with other rows and columns of the matrix results in 0
+- We can prove this using NumPy also 
+- ![alt text](image-101.png)
+- ![alt text](image-102.png)
+- ![alt text](image-103.png)
+- ![alt text](image-104.png)
+- ![alt text](image-108.png)
+- ![alt text](image-105.png)
+- ![alt text](image-106.png)
+- ![alt text](image-107.png)
+- We've now determined that, in addition to being orthogonal, the columns of $K$ have unit norm, therefore they are orthonormal.
+- To ensure that $K$ is an orthogonal matrix, we would need to show that not only does it have orthonormal columns but it has orthonormal rows are as well. Since $K^T \neq K$, we can't prove this quite as straightforwardly as we did with $I_3$.
+- One approach would be to repeat the steps we used to determine that $K$ has orthogonal columns with all of the matrix's rows (please feel free to do so). Alternatively, we can use an orthogonal matrix-specific equation from the slides, $A^TA = I$, to demonstrate that $K$ is orthogonal in a single line of code
+- ![alt text](image-109.png)
+
+## Eigenvectors and EigenValues
+
