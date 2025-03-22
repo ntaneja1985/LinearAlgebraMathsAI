@@ -488,4 +488,439 @@ _ = plt.axhline(y=-1, color='purple', linestyle='--')
 - ![alt text](image-109.png)
 
 ## Eigenvectors and EigenValues
+- Here we will use Tensors in Python to solve system of equations and identifying meaningful patterns in data
+- **Determinant of a matrix** is a scalar that provides key information about how a matrix transforms other tensors.
+- **Singular Value Decomposition** is used to compress data by decreasing the size of a matrix while retaining its most informative components.
+- **Moore-Penrose-Pseudoinverse** is a hugely useful tool that enables us to solve for unknown values in linear systems that aren't appropriate for ordinary matrix inversion, such as the overdetermined systems of equations that are typical of machine learning.
 
+### Review of Linear Algebra
+- Solving for unknowns in a system of equations
+- Remember sheriff-bank robber car example 
+- ![alt text](image-110.png)
+- ![alt text](image-111.png)
+- ![alt text](image-112.png)
+- ![alt text](image-113.png)
+- ![alt text](image-114.png)
+- Linear algebra can used to solve for unknowns in ML algos, including deep learning.
+- We can reduce dimensionality (e.g principal component analysis)
+- Linear algebra is great for ranking results(e.g with eigenvector, including in Google Page Rank algorithm)
+- Linear Algebra is good for recommender systems like movie recommendations in Netflix(SVD)
+- Good for NLP(e.g SVD, Matrix Factorization)
+- ![alt text](image-115.png)
+- ![alt text](image-116.png)
+- ![alt text](image-117.png)
+- ![alt text](image-118.png)
+- ![alt text](image-119.png)
+- ![alt text](image-120.png)
+- ![alt text](image-122.png)
+- ![alt text](image-123.png)
+- ![alt text](image-124.png)
+- Remember overdeterminations and underdeterminations
+- ![alt text](image-125.png)
+
+### Applying Matrices
+- All that "Applying Matrices" means is perform Matrix Multiplication
+- ![alt text](image-126.png)
+- ![alt text](image-127.png)
+- ![alt text](image-128.png)
+- ![alt text](image-129.png)
+- ![alt text](image-130.png)
+- ![alt text](image-131.png)
+
+
+### Affine Transformations
+- These are particularly useful transformations like flipping and or rotating that we carry out by applying matrices.
+- ![alt text](image-132.png)
+- Let's plot  v  using my plot_vectors() function (which is based on Hadrien Jean's plotVectors() function
+```python
+v = np.array([3, 1])
+v # Output is array([3, 1])
+
+import matplotlib.pyplot as plt
+def plot_vectors(vectors, colors):
+    """
+    Plot one or more vectors in a 2D plane, specifying a color for each. 
+
+    Arguments
+    ---------
+    vectors: list of lists or of arrays
+        Coordinates of the vectors to plot. For example, [[1, 3], [2, 2]] 
+        contains two vectors to plot, [1, 3] and [2, 2].
+    colors: list
+        Colors of the vectors. For instance: ['red', 'blue'] will display the
+        first vector in red and the second in blue.
+        
+    Example
+    -------
+    plot_vectors([[1, 3], [2, 2]], ['red', 'blue'])
+    plt.xlim(-1, 4)
+    plt.ylim(-1, 4)
+    """
+    plt.figure()
+    plt.axvline(x=0, color='lightgray')
+    plt.axhline(y=0, color='lightgray')
+
+    for i in range(len(vectors)):
+        x = np.concatenate([[0,0],vectors[i]])
+        plt.quiver([x[0]], [x[1]], [x[2]], [x[3]],
+                   angles='xy', scale_units='xy', scale=1, color=colors[i],)
+
+
+# Run the above program like this
+plot_vectors([v], ['lightblue'])
+plt.xlim(-1, 5)
+_ = plt.ylim(-1, 5)
+
+```
+- Result is the following:
+- ![alt text](image-133.png)
+- "Applying" a matrix to a vector (i.e., performing matrix-vector multiplication) can linearly transform the vector, e.g, rotate it or rescale it.
+- The identity matrix, introduced earlier, is the exception that proves the rule: Applying an identity matrix does not transform the vector as shown below:
+
+```python
+
+v = np.array([3, 1])
+v # Output is array([3, 1])
+
+I = np.array([[1, 0], [0, 1]])
+I # Output is array([[1, 0],
+                    #[0, 1]])
+Iv = np.dot(I, v)
+Iv # Output is array([3, 1])
+
+plot_vectors([Iv], ['blue'])
+plt.xlim(-1, 5)
+_ = plt.ylim(-1, 5)
+
+```
+- Result is the same as earlier when we just plotted the vector in light-blue color
+- ![alt text](image-134.png)
+
+- In contrast, consider this non-identity matrix (let's call it  E ) that flips vectors over the  x -axis:
+
+```python
+
+v = np.array([3, 1])
+v # Output is array([3, 1])
+
+E = np.array([[1, 0], [0, -1]])
+E # Output is array([[ 1,  0],
+                    #[ 0, -1]])
+
+Ev = np.dot(E, v)
+Ev #Output is array([ 3, -1])
+
+plot_vectors([v, Ev], ['lightblue', 'blue'])
+plt.xlim(-1, 5)
+_ = plt.ylim(-3, 3)
+
+```
+- Result is ![alt text](image-135.png)
+
+- Lets consider another matrix F, that flips vectors over the y-axis
+```python
+F = np.array([[-1, 0], [0, 1]])
+F # Output is array([[-1,  0],
+                    #[ 0,  1]])
+Fv = np.dot(F, v)
+Fv #Output is array([-3,  1])
+
+plot_vectors([v, Fv], ['lightblue', 'blue'])
+plt.xlim(-4, 4)
+_ = plt.ylim(-1, 5)
+```
+- Result is 
+- ![alt text](image-136.png)
+- Applying a flipping matrix is an example of an **affine transformation**: a change in geometry that may adjust distances or angles between vectors, but preserves parallelism between them.
+- In addition to flipping a matrix over an axis (a.k.a., reflection), other common affine transformations include:
+- Scaling (changing the length of vectors)
+- Shearing (example of this on the Mona Lisa coming up shortly)
+- Rotation
+- A single matrix can apply multiple affine transforms simultaneously (e.g., flip over an axis and rotate 45 degrees). As an example, let's see what happens when we apply this matrix  A  to the vector  v :
+  
+```python
+v = np.array([3, 1])
+v # Output is array([3, 1])
+
+A = np.array([[-1, 4], [2, -2]])
+A #Output is array([[-1,  4],
+                   #[ 2, -2]])
+
+Av = np.dot(A, v)
+Av #Output is array([1, 4])
+
+plot_vectors([v, Av], ['lightblue', 'blue'])
+plt.xlim(-1, 5)
+_ = plt.ylim(-1, 5)
+
+```
+- Result is ![alt text](image-137.png)
+- We can concatenate several vectors together into a matrix (say, $V$), where each column is a separate vector. Then, whatever linear transformations we apply to $V$ will be independently applied to each column (vector): 
+```python
+v = np.array([3, 1])
+v # Output is array([3, 1])
+v2 = np.array([2, 1])
+
+# recall that we need to convert array to 2D to transpose into column, e.g.:
+np.matrix(v).T 
+
+v3 = np.array([-3, -1]) # mirror image of v over both axes
+v4 = np.array([-1, 1])
+
+V = np.concatenate((np.matrix(v).T, 
+                    np.matrix(v2).T,
+                    np.matrix(v3).T,
+                    np.matrix(v4).T), 
+                   axis=1)
+V #Output is matrix([[ 3,  2, -3, -1],
+                    #[ 1,  1, -1,  1]])
+
+IV = np.dot(I, V)
+IV #Output is matrix([[ 3,  2, -3, -1],
+                    # [ 1,  1, -1,  1]])
+
+A = np.array([[-1, 4], [2, -2]])
+A #Output is array([[-1,  4],
+                   #[ 2, -2]])
+AV = np.dot(A, V)
+AV #Output is matrix([[ 1,  2, -1,  5],
+                     #[ 4,  2, -4, -4]])
+
+# function to convert column of matrix to 1D vector: 
+def vectorfy(mtrx, clmn):
+    return np.array(mtrx[:,clmn]).reshape(-1)
+
+vectorfy(V, 0) #Output is array([3, 1])
+
+plot_vectors([vectorfy(V, 0), vectorfy(V, 1), vectorfy(V, 2), vectorfy(V, 3),
+             vectorfy(AV, 0), vectorfy(AV, 1), vectorfy(AV, 2), vectorfy(AV, 3)], 
+            ['lightblue', 'lightgreen', 'lightgray', 'orange',
+             'blue', 'green', 'gray', 'red'])
+plt.xlim(-4, 6)
+_ = plt.ylim(-5, 5)
+
+```
+- Result is ![alt text](image-138.png)
+- Affine transformations are linear transformations followed by translation. They are useful because they allow geometric manipulations while maintaining the basic structure of objects. For example, in your pharmacy management system, affine transformations might be useful in data visualization when adjusting graphs or plots to different scales or orientations. 
+
+## Eigenvectors and Eigenvalues
+- ![alt text](image-139.png)
+- ![alt text](image-140.png)
+- Being on same span means being on the same line
+- Note in shearing matrix, the Red vector is knocked off its span, but blue vector is not. 
+- So blue vector is an eigenvector but not the red vector.
+- **Eigenvalues** are scalar values that tell you how much the eigenvectors length has changed as a result of applying the particular matrix that we're applying.
+- ![alt text](image-141.png)
+- If eigenvector were to double in length, its eigenvalue = 2; if it halves, eigenvalue = 0.5, if we fip and shear, then eigenvalue = -1
+- ![alt text](image-142.png)
+- Similarly if the eigenvector were to double in length, while reversing direction, eigenvalue would be -2
+- An **eigenvector** (*eigen* is German for "typical"; we could translate *eigenvector* to "characteristic vector") is a special vector $v$ such that when it is transformed by some matrix (let's say $A$), the product $Av$ has the exact same direction as $v$.
+- An **eigenvalue** is a scalar (traditionally represented as $\lambda$) that simply scales the eigenvector $v$ such that the following equation is satisfied: 
+- $Av = \lambda v$
+- This is rather confusing, on the left-side we are applying a matrix to a vector and on the right-side we are applying a scalar to a vector
+- Eigenvectors and eigenvalues can be derived algebraically (e.g., with the QR algorithm, which was independently developed in the 1950s by both Vera Kublanovskaya and John Francis), however this is outside scope of the ML Foundations series. We'll cheat with NumPy eig() method, which returns a tuple of:
+- a vector of eigenvalues
+- a matrix of eigenvectors
+- Essentially, eigenvectors and eigenvalues act as magnifying glasses: they help you focus on the most meaningful directions and magnitudes of change in your data or systems. It's like having a secret tool that cuts through complexity so you can make smarter decisions.
+- ![alt text](image-145.png)
+- ![alt text](image-146.png)
+```python
+A = np.array([[-1, 4], [2, -2]])
+A #Output is array([[-1,  4],
+                   #[ 2, -2]])
+
+
+lambdas, V = np.linalg.eig(A) 
+# The matrix contains as many eigenvectors as there are columns of A:
+V #Output is array([[ 0.86011126, -0.76454754],
+                   #[ 0.51010647,  0.64456735]])
+
+# With a corresponding eigenvalue for each eigenvector:
+lambdas #Output is array([ 1.37228132, -4.37228132])
+
+# Let's confirm that  Av=λv  for the first eigenvector:
+
+v = V[:,0] 
+v # Output is array([0.86011126, 0.51010647])
+
+lambduh = lambdas[0] # note that "lambda" is reserved term in Python
+lambduh #Output is np.float64(1.3722813232690143)
+
+Av = np.dot(A, v)
+Av #Output is array([1.18031462, 0.70000958])
+
+lambduh * v #Output is array([1.18031462, 0.70000958])
+
+plot_vectors([Av, v], ['blue', 'lightblue'])
+plt.xlim(-1, 2)
+_ = plt.ylim(-1, 2)
+
+
+# again for the second eigenvector of A:
+v2 = V[:,1]
+v2 #Output is array([-0.76454754,  0.64456735])
+
+lambda2 = lambdas[1]
+lambda2 #Output is -4.372281323269014
+
+Av2 = np.dot(A, v2)
+Av2 #Output is array([ 3.34281692, -2.81822977])
+
+lambda2 * v2 #Output is array([ 3.34281692, -2.81822977])
+
+plot_vectors([Av, v, Av2, v2], 
+            ['blue', 'lightblue', 'green', 'lightgreen'])
+plt.xlim(-1, 4)
+_ = plt.ylim(-3, 2)
+
+```
+- Result for the first one is ![alt text](image-143.png)
+- Result for the second plot is ![alt text](image-144.png)
+
+### Eigenvectors in greater than 2 dimensions
+- While plotting gets trickier in higher-dimensional spaces, we can nevertheless find and use eigenvectors with more than two dimensions. Here's a 3D example (there are three dimensions handled over three rows):
+```python
+X = np.array([[25, 2, 9], [5, 26, -5], [3, 7, -1]])
+X #Output is array([[25,  2,  9],
+                   #[ 5, 26, -5],
+                   #[ 3,  7, -1]])
+lambdas_X, V_X = np.linalg.eig(X)
+V_X #Output is array([[-0.71175736, -0.6501921 , -0.34220476],
+                     #[-0.66652125,  0.74464056,  0.23789717],
+                     #[-0.22170001,  0.15086635,  0.90901091]])
+
+lambdas_X # a corresponding eigenvalue for each eigenvector
+    #Output is array([29.67623202, 20.62117365, -0.29740567])
+
+# Confirm  Xv=λv  for an example eigenvector:
+v_X = V_X[:,1] 
+v_X #Output is array([-0.6501921 ,  0.74464056,  0.15086635])
+
+lambda_X = lambdas_X[1] 
+lambda_X #Output is np.float64(20.62117365053535)
+
+np.dot(X, v_X) # matrix multiplication
+# Output is array([-13.40772428,  15.3553624 ,   3.11104129])
+
+lambda_X * v_X
+#Output is array([-13.40772428,  15.3553624 ,   3.11104129])
+# As you can see Xv = λv
+
+```
+
+### Matrix Determinants
+- A determinant is a special scalar value that we can calculate for any given matrix.
+- It has a number of very useful properties as well as an intimate relationship with eigenvalues
+- Matrix determinants map a square matrix to a single special scalar value.
+- The key here is that we do need to have square matrices in order to calculate their determinant.
+- It enables us to determine whether a matrix can be inverted.
+- ![alt text](image-147.png)
+- ![alt text](image-148.png)
+```python
+X = np.array([[4, 2], [-5, -3]])
+X # Output is array([[ 4,  2],
+                    #[-5, -3]])
+
+np.linalg.det(X) #Output is -2
+```
+- ![alt text](image-149.png)
+- As determinant is 0, no solution is possible as it is a singular matrix
+- ![alt text](image-150.png)
+
+### Determinants of Larger Matrices
+- We will use recursion
+- Lets say we have a 5 x 5 matrix
+- We will first calculate determinant of bottom 2 x 2 matrix, then 3 x 3 matrix, then 4 x 4 matrix and finally 5 x 5 matrix
+- ![alt text](image-151.png)
+- ![alt text](image-152.png)
+```python
+X = np.array([[1, 2, 4], [2, -1, 3], [0, 5, 1]])
+X #Output is array([[ 1,  2,  4],
+                   #[ 2, -1,  3],
+                   #[ 0,  5,  1]])
+np.linalg.det(X) #Output is 20
+
+```
+### Determinants and EigenValues
+- det(X) = product of all eigenvalues of X (lambdas)
+```python
+X = np.array([[1, 2, 4], [2, -1, 3], [0, 5, 1]])
+X #Output is array([[ 1,  2,  4],
+                   #[ 2, -1,  3],
+                   #[ 0,  5,  1]])
+np.linalg.det(X) #Output is 20
+
+
+lambdas, V = np.linalg.eig(X)
+lambdas #EigenValues
+#Output is array([-3.25599251, -1.13863631,  5.39462882])
+
+np.prod(lambdas) #Output is 20 (same as the determinant)
+
+```
+- |det(X)| quantifies volume change as a result of applying X to some tensor
+- ![alt text](image-153.png)
+- If any one of a matrix's eigenvalues is zero, then the product of the eigenvalues must be zero and the determinant must also be zero.
+- The determinant represents how a matrix scales volume during its transformation.
+- Eigenvalues describe scaling factors along their corresponding eigenvectors. Multiplying all eigenvalues gives the total scaling effect, which matches the determinant.
+- The determinant is used in assessing properties of eigenvalues, which are vital for dimensionality reduction techniques like PCA.
+- In systems like control theory or reinforcement learning, the determinant (product of eigenvalues) helps analyze whether a system is stable.
+- In systems like control theory or reinforcement learning, the determinant (product of eigenvalues) helps analyze whether a system is stable.
+
+### Eigen Decomposition
+- Described by this formula
+- ![alt text](image-154.png)
+- ![alt text](image-155.png)
+- The **eigendecomposition** of some matrix $A$ is 
+
+$A = V \Lambda V^{-1}$
+
+Where: 
+
+* As in examples above, $V$ is the concatenation of all the eigenvectors of $A$
+* $\Lambda$ (upper-case $\lambda$) is the diagonal matrix diag($\lambda$). Note that the convention is to arrange the lambda values in descending order; as a result, the first eigenvalue (and its associated eigenvector) may be a primary characteristic of the matrix $A$.
+
+```python
+# This was used earlier as a matrix X; it has nice clean integer eigenvalues...
+A = np.array([[4, 2], [-5, -3]]) 
+A #Output is array([[ 4,  2],
+                   #[-5, -3]])
+lambdas, V = np.linalg.eig(A)
+V #Output is eigenvectors array([[ 0.70710678, -0.37139068],
+                   #[-0.70710678,  0.92847669]])
+lambdas # Output is array([ 2., -1.])
+Vinv = np.linalg.inv(V)
+Vinv #Output is array([[2.3570226 , 0.94280904],
+                      #[1.79505494, 1.79505494]])
+Lambda = np.diag(lambdas)
+Lambda #Output is array([[ 2.,  0.],
+                        #[ 0., -1.]])
+
+np.dot(V, np.dot(Lambda, Vinv)) #Output is array([[ 4,  2],
+                                                 #[-5, -3]])
+
+```
+- The above confirms that $A = V \Lambda V^{-1}$: 
+- Eigendecomposition is not possible with all matrices. And in some cases where it is possible, the eigendecomposition involves complex numbers instead of straightforward real numbers.
+- In machine learning, however, we are typically working with real symmetric matrices, which can be conveniently and efficiently decomposed into real-only eigenvectors and real-only eigenvalues.
+- If $A$ is a real symmetric matrix then...
+
+$A = Q \Lambda Q^T$
+
+...where $Q$ is analogous to $V$ from the previous equation except that it's special because it's an orthogonal matrix. 
+ - Remember it is cheap to compute the transpose of a matrix compared to its inverse. 
+ - Remember Q^T * Q = I (Identity Matrix)
+
+### EigenVector and EigenValue Applications
+- Eigenvectors and eigenvalues reveal the core properties of a matrix:
+- What it does (directions and scaling),
+- How it acts (stability, dimensionality),
+- And how to simplify or analyze its effects
+- ![alt text](image-156.png)
+- ![alt text](image-158.png)
+- ![alt text](image-159.png)
+- Singular value decomposition is used to compress the size of media files of data files.
+- Moore-penrose Pseudoinverse is used to fit a regression line to points 
+- Principal Component Analysis is used to identify some underlying structure in unlabeled data.
+
+## Matrix Operations for Machine Learning
