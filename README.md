@@ -910,6 +910,19 @@ $A = Q \Lambda Q^T$
 ...where $Q$ is analogous to $V$ from the previous equation except that it's special because it's an orthogonal matrix. 
  - Remember it is cheap to compute the transpose of a matrix compared to its inverse. 
  - Remember Q^T * Q = I (Identity Matrix)
+```python
+P = torch.tensor([[25, 2, -5], [3, -2, 1], [5, 7, 4.]])
+
+eValuesP,eVectorsP = torch.linalg.eig(P)
+      
+singular1 = torch.diag(eValuesP)                               
+singular1
+inverseVectors = torch.inverse(eVectorsP)
+inverseVectors
+result1 = torch.mm(eVectorsP, torch.mm(singular1, inverseVectors))
+result1
+
+```
 
 ### EigenVector and EigenValue Applications
 - Eigenvectors and eigenvalues reveal the core properties of a matrix:
@@ -924,3 +937,341 @@ $A = Q \Lambda Q^T$
 - Principal Component Analysis is used to identify some underlying structure in unlabeled data.
 
 ## Matrix Operations for Machine Learning
+- ![alt text](image-160.png)
+
+### Singular Value Decomposition(SVD)
+- Unlike eigen decomposition, which is applicable to square matrices only, Singular value decomposition or SVD is applicable to any real valued matrix.
+- ![alt text](image-161.png)
+- SVD of matrix $A$ is: 
+
+$A = UDV^T$
+
+Where: 
+
+* $U$ is an orthogonal $m \times m$ matrix; its columns are the **left-singular vectors** of $A$.
+* $V$ is an orthogonal $n \times n$ matrix; its columns are the **right-singular vectors** of $A$.
+* $D$ is a diagonal $m \times n$ matrix; elements along its diagonal are the **singular values** of $A$.
+
+```python
+A = np.array([[-1, 2], [3, -2], [5, 7]])
+A #Output is array([[-1,  2],
+                   #[ 3, -2],
+                   #[ 5,  7]])
+
+U, d, VT = np.linalg.svd(A) # V is already transposed
+
+U #Output is array([[ 0.12708324,  0.47409506,  0.87125411],
+                  # [ 0.00164602, -0.87847553,  0.47778451],
+                  # [ 0.99189069, -0.0592843 , -0.11241989]])
+
+VT #Output is array([[ 0.55798885,  0.82984845],
+                    #[-0.82984845,  0.55798885]])
+
+d  #Output is array([8.66918448, 4.10429538])
+
+np.diag(d) #Output is array([[8.66918448, 0.        ],
+                            #[0.        , 4.10429538]])
+
+# D  must have the same dimensions as A for UDVT matrix multiplication to be possible:
+
+D = np.concatenate((np.diag(d), [[0, 0]]), axis=0)
+D #Output is array([[8.66918448, 0.        ],
+                   #[0.        , 4.10429538],
+                   #[0.        , 0.        ]])
+
+np.dot(U, np.dot(D, VT)) #Output is array([[-1.,  2.],
+                                          #[ 3., -2.],
+                                          #[ 5.,  7.]])
+
+```
+- SVD and eigendecomposition are closely related to each other: 
+
+* Left-singular vectors of $A$ = eigenvectors of $AA^T$.
+* Right-singular vectors of $A$ = eigenvectors of $A^TA$.
+* Non-zero singular values of $A$ = square roots of eigenvalues of $AA^T$ = square roots of eigenvalues of $A^TA$
+
+### Data Compression with SVD
+- Singular Value Decomposition (SVD) is a powerful tool from linear algebra that can be used to compress images efficiently by reducing the amount of data needed to represent them while preserving essential features.
+- SVD decomposes a matrix A (representing the image) into three matrices:
+- 𝐴 = 𝑈Σ𝑉^𝑇
+
+- U is an m×m orthogonal matrix whose columns are the left singular vectors.
+
+- Σ is an m×n diagonal matrix containing the singular values (non-negative, in descending order).
+- 𝑉^𝑇 is an n×n orthogonal matrix whose rows are the right singular vectors.
+- For an image, A is typically an m×n matrix where each entry represents a pixel's intensity (in grayscale) or a channel value (e.g., in RGB images).
+
+```python
+from PIL import Image
+wget https://raw.githubusercontent.com/jonkrohn/DLTFpT/master/notebooks/oboe-with-book.jpg
+img = Image.open('oboe-with-book.jpg')
+_ = plt.imshow(img)
+
+# Convert image to grayscale so that we don't have to deal with the complexity of multiple color channels:
+imggray = img.convert('LA')
+_ = plt.imshow(imggray)
+
+
+#Convert data into numpy matrix, which doesn't impact image data:
+
+imgmat = np.array(list(imggray.getdata(band=0)), float)
+imgmat.shape = (imggray.size[1], imggray.size[0])
+imgmat = np.matrix(imgmat)
+_ = plt.imshow(imgmat, cmap='gray')
+
+# Calculate SVD of the image
+U, sigma, V = np.linalg.svd(imgmat)
+
+# As eigenvalues are arranged in descending order in diag( λ ) so too are singular values, by convention, arranged in descending order in  D  (or, in this code, diag( σ )). Thus, the first left-singular vector of  U  and first right-singular vector of  V  may represent the most prominent feature of the image:
+
+reconstimg = np.matrix(U[:, :1]) * np.diag(sigma[:1]) * np.matrix(V[:1, :])
+_ = plt.imshow(reconstimg, cmap='gray')
+
+# Additional singular vectors improve the image quality:
+for i in [2, 4, 8, 16, 32, 64]:
+    reconstimg = np.matrix(U[:, :i]) * np.diag(sigma[:i]) * np.matrix(V[:i, :])
+    plt.imshow(reconstimg, cmap='gray')
+    title = "n = %s" % i
+    plt.title(title)
+    plt.show()
+
+# With 64 singular vectors, the image is reconstructed quite well, however the data footprint is much smaller than the original image:
+
+```
+- ![alt text](image-162.png)
+- Specifically, the image represented as 64 singular vectors is 3.7% of the size of the original!
+- Alongside images, we can use singular vectors for dramatic, lossy compression of other types of media files.
+
+### Moore-Penrose Pseudoinverse
+- It can almost magically! solve for unknowns in a system of linear equations
+- In linear algebra, the inversion of a matrix refers to finding a matrix that, when multiplied with the original matrix, yields the identity matrix. This "inverse" matrix essentially "undoes" the effect of the original matrix in a linear transformation.
+- Determinant of this matrix should also be non-zero
+- Remember if det(A) is zero, the matrix is a singular matrix
+- ![alt text](image-163.png)
+- ![alt text](image-164.png)
+- Moore-Penrose PseudoInverse helps us to invert non-square matrices. 
+- ![alt text](image-165.png)
+- However solving an equation maybe still be possible by other means even if matrix cannot be inverted
+- One such technique is Moore-Penrose PseudoInverse 
+- ![alt text](image-166.png)
+```python
+A #Output is array([[-1,  2],
+                   #[ 3, -2],
+                   #[ 5,  7]])
+
+# U = left singular vectors of A
+# V = right singular vectors of A
+# d = eigenValues/singular values
+U, d, VT = np.linalg.svd(A)       
+
+#To create  D+ , we first invert the non-zero values of  d :
+D = np.diag(d)
+D #Output is array([[8.66918448, 0.        ],
+                  #[0.        , 4.10429538]])
+
+# Remember Dplus  = Transpose of D with reciprocal of all non-zero elements
+# 1/8.669 = 0.11535355865728457
+# 1/4.104 = 0.24366471734892786
+
+Dinv = np.linalg.inv(D)
+Dinv #Output is array([[0.1153511 , 0.        ],
+                     #[0.        , 0.24364718]])
+
+# D+  must have the same dimensions as AT in order for VD+UT matrix multiplication to be possible
+
+Dplus = np.concatenate((Dinv, np.array([[0, 0]]).T), axis=1)
+Dplus #Output is array([[0.1153511 , 0.        , 0.        ],
+                      #[0.        , 0.24364718, 0.        ]])
+
+# Now we have everything we need to calculate  A+  with  V * D^+ * U^T :
+
+np.dot(VT.T, np.dot(Dplus, U.T)) 
+#Output is array([[-0.08767773,  0.17772512,  0.07582938],
+                 #[ 0.07661927, -0.1192733 ,  0.08688784]])
+
+# Working out this derivation is helpful for understanding how Moore-Penrose pseudoinverses work, but unsurprisingly NumPy is loaded with an existing method pinv()
+np.linalg.pinv(A)
+#Output is array([[-0.08767773,  0.17772512,  0.07582938],
+                 #[ 0.07661927, -0.1192733 ,  0.08688784]])
+```
+
+### Regression with PseudoInverse 
+- ![alt text](image-167.png)
+- It would be difficult to find as many houses in our dataset as we have features
+- So Obviously it is not a square matrix and it is not easily invertable.
+- ![alt text](image-168.png)
+- ![alt text](image-169.png)
+- ![alt text](image-170.png)
+- overdetermined system means number of rows is greater than number of columns
+- underdetermined system means number of rows is less than number of columns
+- ![alt text](image-171.png)
+- In Deep Learning models, possibility of underdetermined system is high
+- For regression problems, we typically have many more cases ( n , or rows of  X ) than features to predict (columns of  X ). Let's solve a miniature example of such an overdetermined situation.
+- We have eight data points ( n  = 8):
+```python
+x1 = [0, 1, 2, 3, 4, 5, 6, 7.] # E.g.: Dosage of drug for treating Alzheimer's disease
+y = [1.86, 1.31, .62, .33, .09, -.67, -1.23, -1.37] # E.g.: Patient's "forgetfulness score"
+
+title = 'Clinical Trial'
+xlabel = 'Drug dosage (mL)'
+ylabel = 'Forgetfulness'
+
+
+fig, ax = plt.subplots()
+plt.title(title)
+plt.xlabel(xlabel)
+plt.ylabel(ylabel)
+_ = ax.scatter(x1, y)
+
+
+```
+- ![alt text](image-172.png)
+- Although it appears there is only one predictor ( x1 ), our model requires a second one (let's call it  x0 ) in order to allow for a  y -intercept. Without this second variable, the line we fit to the plot would need to pass through the origin (0, 0). The  y -intercept is constant across all the points so we can set it equal to 1 across the board:
+```python
+x0 = np.ones(8)
+x0 #Output is array([1., 1., 1., 1., 1., 1., 1., 1.])
+
+# Concatenate  x0  and  x1  into a matrix  X :
+X = np.concatenate((np.matrix(x0).T, np.matrix(x1).T), axis=1)
+X #Output is matrix([[1., 0.],
+                    #[1., 1.],
+                    #[1., 2.],
+                    #[1., 3.],
+                    #[1., 4.],
+                    #[1., 5.],
+                    #[1., 6.],
+                    #[1., 7.]])
+
+w = np.dot(np.linalg.pinv(X), y)
+w #Output is matrix([[ 1.76      , -0.46928571]])
+
+#The first weight corresponds to the  y -intercept of the line, which is typically denoted as  b :
+b = np.asarray(w).reshape(-1)[0]
+b
+ #Output is np.float64(1.7599999999999985)
+
+#While the second weight corresponds to the slope of the line, which is typically #denoted as  m :
+m = np.asarray(w).reshape(-1)[1]
+m
+#Output is np.float64(-0.4692857142857139)
+
+fig, ax = plt.subplots()
+
+plt.title(title)
+plt.xlabel(xlabel)
+plt.ylabel(ylabel)
+
+ax.scatter(x1, y)
+
+x_min, x_max = ax.get_xlim()
+y_at_xmin = m*x_min + b
+y_at_xmax = m*x_max + b
+
+ax.set_xlim([x_min, x_max])
+_ = ax.plot([x_min, x_max], [y_at_xmin, y_at_xmax], c='C01')
+
+
+```
+- From the slides, we know that we can calculate the weights $w$ using the equation $w = X^+y$: 
+- ![alt text](image-173.png)
+
+### Trace Operator
+- It frequently comes in handy for rearranging linear algebra equations, including ones that are common in machine learning.
+- Denoted as Tr($A$). Simply the sum of the diagonal elements of a matrix: $$\sum_i A_{i,i}$$
+- The trace operator has a number of useful properties that come in handy while rearranging linear algebra equations, e.g.:
+
+* Tr($A$) = Tr($A^T$)
+* Assuming the matrix shapes line up: Tr($ABC$) = Tr($CAB$) = Tr($BCA$)
+
+- In particular, the trace operator can provide a convenient way to calculate a matrix's Frobenius norm: $$||A||_F = \sqrt{\mathrm{Tr}(AA^\mathrm{T})}$$
+
+```python
+A = np.array([[25, 2], [5, 4]])
+A #Output is array([[25,  2],
+                   #[ 5,  4]])
+25 + 4 #Output is 29
+
+np.trace(A) #Output is 29
+
+
+#Another example
+A_p #Output is tensor([[-1.,  2.],
+                      #[ 3., -2.],
+                      #[ 5.,  7.]])
+frobenius_norm_p = torch.sqrt(torch.trace(torch.matmul(A_p,A_p.T)))
+frobenius_norm_p #Output is tensor(9.5917)
+norm2 = torch.norm(A_p) #Calculate the frobenius norm
+norm2 == frobenius_norm_p #Output is true, hence proved
+```
+
+### Principal Component Analysis
+- It is a prevalent and powerful machine learning technique for working with unlabeled data.
+- Principal component analysis is a simple machine learning algorithm.
+- It is unsupervised, so this means that it enables the identification of structure in unlabeled data.
+- If you have a bunch of data, say you have a bunch of measurements of flowers, but you don't have any labels for what kinds of flowers they are, you can nevertheless take those measurements and use an unsupervised learning algorithm like PCA to identify underlying structure in your data.
+- ![alt text](image-174.png)
+```python
+from sklearn import datasets
+iris = datasets.load_iris() ##load a sample dataset using the scikitlearn library
+
+iris.data.shape #Output is (150,4) meaning there are 150 flowers with 4 features specified for each
+
+iris.get("feature_names") #Output is the name of features for each of the flowers
+                          # ['sepal length (cm)',
+                            #'sepal width (cm)',
+                            #'petal length (cm)',
+                             #'petal width (cm)']
+
+# Take the first 6 flowers
+iris.data[0:6,:] #Output is array([[5.1, 3.5, 1.4, 0.2],
+                                  #[4.9, 3. , 1.4, 0.2],
+                                  #[4.7, 3.2, 1.3, 0.2],
+                                  #[4.6, 3.1, 1.5, 0.2],
+                                  #[5. , 3.6, 1.4, 0.2],
+                                  #[5.4, 3.9, 1.7, 0.4]])
+
+from sklearn.decomposition import PCA
+pca = PCA(n_components=2) #Return 2 principal components that account for the most structure
+
+# Using the flower data, return the 2 principal components for each flower
+X = pca.fit_transform(iris.data)
+
+X.shape #Output is (150,2)
+
+X[0:6,:] #Note here for the first 6 flowers, we are showing the 2 principal **components**
+# Output is array([[-2.68412563,  0.31939725],
+                  #[-2.71414169, -0.17700123],
+                  #[-2.88899057, -0.14494943],
+                  #[-2.74534286, -0.31829898],
+                  #[-2.72871654,  0.32675451],
+                  #[-2.28085963,  0.74133045]])
+
+_ = plt.scatter(X[:, 0], X[:, 1])
+
+# Fortunately we have some labels to understand the data
+# We will use it just to colorize the scatter plots
+iris.target.shape #Output is (150,)
+iris.target[0:6] #Output is array([0, 0, 0, 0, 0, 0])
+
+unique_elements, counts_elements = np.unique(iris.target, return_counts=True)
+
+# The following lines shows that for 150 flowers dataset, each of 50 flowers are different i.e they are different flowers as indicated by their labels: 0,1,2
+np.asarray((unique_elements, counts_elements)) #Output is array([[ 0,  1,  2],
+                                                                #[50, 50, 50]])
+
+# Output the 3 different types of flowers some names
+list(iris.target_names)
+#Output is [np.str_('setosa'), np.str_('versicolor'), np.str_('virginica')]
+
+#Lets plot them
+_ = plt.scatter(X[:, 0], X[:, 1], c=iris.target)
+
+```
+- ![alt text](image-175.png)
+- ![alt text](image-176.png)
+- As we can see now we can observe that different flowers occupy different section of the plot.
+- If we now have to predict any flower, we just need to calculate their euclidean distance from the closest plot points and then we can actually make an accurate prediction. 
+- Using principal component analysis we can breakdown a large dataset into its most unique components which give most meaningful information about the data.
+- Internally it uses eigenvectors and eigenvalues only
+- ![alt text](image-177.png) 
+- ![alt text](image-178.png)
