@@ -1275,3 +1275,131 @@ _ = plt.scatter(X[:, 0], X[:, 1], c=iris.target)
 - Internally it uses eigenvectors and eigenvalues only
 - ![alt text](image-177.png) 
 - ![alt text](image-178.png)
+
+### Final thoughts on Linear Algebra
+- We talked about singular value decomposition, which allowed us to compress an image file.
+- We talked about the Moore-penrose Pseudoinverse, which allowed us to perform something like matrix inversion of non-square matrices, enabling us to solve for unknowns in systems of equations like those that are common in machine learning.
+- We learned about the trace operator quickly, and then we learned about principal component analysis, which ties together the trace operator and lots of other concepts that we learned earlier in this Machine Learning Foundation series to Power PCA, which is a simple machine learning algorithm for handling unlabeled data and finding structure in it.
+
+# Calculus in Machine Learning
+
+## Limits 
+- ![alt text](image-179.png)
+
+### Intro to Differential Calculus
+- Calculus is the mathematical study of continuous change
+- 2 main branches
+- Differential Calculus
+- Integral Calculus
+
+### Differential Calculus
+- Study of the rate of change
+- ![alt text](image-180.png)
+- ![alt text](image-182.png)
+- ![alt text](image-183.png) (Here curve is gradually increasing in steepness)
+- We take a look at the tangents
+- ![alt text](image-184.png)
+- When vehicle is stationary, slope is zero
+- ![alt text](image-185.png)
+- When vehicle is travelling at constant speed
+- ![alt text](image-186.png)
+- ![alt text](image-187.png)
+- We can calculate these slopes using differential calculus
+- ![alt text](image-188.png)
+- Common to denote slopes as m
+- ![alt text](image-189.png)
+- ![alt text](image-191.png)
+- ![alt text](image-192.png)
+
+### Integral Calculus
+- Study of area under curves
+- Facilitates the inverse of differential calculus
+- ![alt text](image-193.png)
+- Note that AUC = Total distance (d) travelled
+
+### Method of Exhaustion
+- Allows us to identify the area of shapes
+- ![alt text](image-194.png)
+- ![alt text](image-196.png)
+### Calculus of the Infinitesimals
+- ![alt text](image-197.png)
+
+### Applications of Calculus
+- ![alt text](image-198.png)
+- In Deep learning algorithms we need to find the gradient descent
+- Imagine trying to train a machine learning model, like predicting house prices or recognizing faces. The model needs to adjust its parameters (weights) to minimize error—just like the hiker finding the lowest point of the mountain. Gradient descent helps the model figure out how to tweak its parameters step by step to improve accuracy.
+- Think of learning a new skill—say playing piano. At first, you make random mistakes (you’re at a "high error" point). After each practice session, you figure out which mistakes to fix and adjust step by step (heading downhill on the error mountain). Eventually, after enough practice, you hit a point where you’re playing smoothly (the bottom of the valley).
+- ![alt text](image-199.png)
+- As we can see above when we train a ML model, the cost keeps decreasing and its accuracy keeps increasing
+- We can also have Gradient ascent to maximize reward(Q-Learning)
+- Higher-order derivatives used in "fancy" optimizers. Remember distance vs time to speed vs time to acceleration over gravity over time.
+- Receiver Operating Characteristic used in Binary Classification
+- ![alt text](image-200.png)
+
+### Calculating Limits 
+- ![alt text](image-201.png)
+- ![alt text](image-202.png)
+- ![alt text](image-203.png)
+- ![alt text](image-204.png)
+- ![alt text](image-205.png)
+- ![alt text](image-206.png)
+
+## Derivatives and Differentiation
+
+### The Delta Method
+- ![alt text](image-208.png)
+- ![alt text](image-209.png)
+- ![alt text](image-211.png)
+- ![alt text](image-210.png)
+- ![alt text](image-213.png)
+- ![alt text](image-214.png)
+- ![alt text](image-215.png)
+- ![alt text](image-216.png)
+
+### Derivative Notation
+- ![alt text](image-217.png)
+
+### Derivative of a constant 
+- ![alt text](image-218.png)
+
+
+### Power Rule
+- ![alt text](image-219.png)
+
+### Constant Multiple Rule
+- ![alt text](image-220.png)
+- ![alt text](image-221.png)
+
+### The Sum Rule
+- ![alt text](image-222.png)
+- ![alt text](image-223.png)
+- ![alt text](image-224.png)
+- ![alt text](image-225.png)
+- ![alt text](image-226.png)
+
+### The Product Rule
+- ![alt text](image-227.png)
+
+### The Quotient Rule
+- ![alt text](image-228.png)
+
+
+### The Chain Rule
+- The chain rule has many applications within machine learning.
+- It is used for gradient descent
+- Gradient descent is found in a huge number of machine learning algorithms from simple regression models all the way through to the most sophisticated deep learning models.
+- ![alt text](image-229.png)
+- ![alt text](image-230.png)
+- ![alt text](image-231.png)
+- ![alt text](image-232.png)
+- ![alt text](image-233.png)
+- ![alt text](image-234.png)
+- ![alt text](image-235.png)
+- ![alt text](image-236.png)
+
+### Power Rule on a Function Chain
+- ![alt text](image-237.png)
+
+
+## Automatic Differentiation
+- It is a computational technique that allows us to scale up the calculation of derivatives to the massive function chains that are common in machine learning.
