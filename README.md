@@ -1403,3 +1403,270 @@ _ = plt.scatter(X[:, 0], X[:, 1], c=iris.target)
 
 ## Automatic Differentiation
 - It is a computational technique that allows us to scale up the calculation of derivatives to the massive function chains that are common in machine learning.
+- ![alt text](image-238.png)
+- Chain rule starts differentiation from the inner-most function onward, the autodiff proceeds from the outermost function inward
+- ![alt text](image-239.png)
+
+### Autodiff with PyTorch
+  **TensorFlow** and **PyTorch** are the two most popular automatic differentiation libraries.
+Let's use them to calculate $dy/dx$ at $x = 5$ where: 
+$$y = x^2$$
+$$ \frac{dy}{dx} = 2x = 2(5) = 10 $$
+```python
+import torch
+
+x = torch.tensor(5.0)
+
+x #Output is tensor(5.)
+
+x.requires_grad_() # contagiously track gradients through forward pass
+#Output is tensor(5., requires_grad=True)
+
+y = x**2
+
+y.backward() # use autodiff
+
+x.grad #Output is tensor(10.)
+
+
+
+```
+- ![alt text](image-240.png)
+
+
+## Line Equation as a Tensor Graph
+- ![alt text](image-241.png)
+- Note that the tensors(edges) hold some information
+- Autodiff, or automatic differentiation, is a game-changer in machine learning because it sidesteps a lot of the messiness that comes with solving equations the old-school algebraic way.
+- First off, autodiff computes derivatives numerically with pinpoint accuracy, down to machine precision, by breaking down complex functions into their basic building blocks and applying the chain rule step-by-step. Algebraic differentiation, on the other hand, requires you to manually work out the derivative of a function symbolically—like solving a math puzzle by hand.
+- That’s fine for something simple like f(x) = x², where the derivative is just 2x, but in machine learning, you’re dealing with insane, nested, multivariable monstrosities—think neural networks with millions of parameters. Trying to derive those by hand is a nightmare, prone to human error, and scales about as well as a paper umbrella in a hurricane.
+- Second, autodiff is automatic. You feed it a function, and it spits out the gradient without you having to think about the math. Tools like PyTorch or TensorFlow have it built in—you write the forward pass, and they handle the backward pass (i.e., the gradients) for free. With the algebraic approach, you’d need to derive every partial derivative yourself, which isn’t just tedious but also impractical when your model changes. Tweak a neural network layer? Good luck rewriting all those equations. Autodiff doesn’t care—it adapts instantly.
+- Third, it’s computationally efficient. Autodiff comes in two flavors: forward mode and reverse mode. Reverse mode (aka backpropagation) is especially clutch for machine learning because it computes gradients for all parameters in a single pass, no matter how many inputs or outputs you’ve got. Algebraic methods don’t have that kind of streamlined elegance—you’d be solving a sprawling system of equations, often redundantly, and likely approximating anyway if it gets too hairy.
+- Let’s start with a basic function, f(x) = x² + 3x + 1. Algebraically, the derivative is df/dx = 2x + 3. With autodiff, we don’t need to figure that out manually—PyTorch does it for us.
+```python
+import torch
+
+# Define the input (requires_grad=True tells PyTorch to track gradients)
+x = torch.tensor(2.0, requires_grad=True)
+
+# Define the function
+f = x**2 + 3*x + 1
+
+# Compute the derivative (backward pass)
+f.backward()
+
+# The gradient is stored in x.grad
+print(f"Function value: {f.item()}")
+print(f"Gradient (df/dx): {x.grad.item()}")
+
+#Outputs
+# Function value: 11.0
+# Gradient (df/dx): 7.0
+```
+- What’s happening here? At x = 2, the function evaluates to 2² + 3*2 + 1 = 11, and the derivative 2*2 + 3 = 7. PyTorch’s autodiff tracked the operations and applied the chain rule automatically. No pencil-and-paper required. Imagine doing this for f(x) = sin(x) * exp(x²) + log(x)—algebraic derivation gets ugly fast, but autodiff doesn’t break a sweat.
+- Now let’s scale it up to a tiny neural network with one layer. We’ll define inputs, weights, and a bias, compute a loss, and let autodiff figure out the gradients for us. This mimics what happens in real machine learning.
+```python
+ import torch
+
+# Inputs (2 samples, 3 features each)
+X = torch.tensor([[1.0, 2.0, 3.0],
+                  [4.0, 5.0, 6.0]])
+
+# True outputs (2 samples)
+y_true = torch.tensor([1.0, 0.0])
+
+# Parameters (weights and bias, with gradients enabled)
+W = torch.tensor([[0.1, 0.2, 0.3]], requires_grad=True)  # 1x3
+b = torch.tensor([0.0], requires_grad=True)            # 1x1
+
+# Forward pass: linear layer (y = XW^T + b)
+y_pred = X @ W.T + b  # Matrix multiplication and broadcasting
+
+# Mean squared error loss
+loss = ((y_pred - y_true) ** 2).mean()
+
+# Backward pass: compute gradients
+loss.backward()
+
+# Check the gradients
+print(f"Loss: {loss.item()}")
+print(f"Gradient of W: {W.grad}")
+print(f"Gradient of b: {b.grad}")
+
+
+# Output
+# Loss: 4.045
+# Gradient of W: tensor([[5.1000, 6.6000, 8.1000]])
+# Gradient of b: tensor([2.1000])
+
+```
+- Here’s the breakdown:
+
+- We’ve got two samples (X) and a linear layer with weights W and bias b.
+- The forward pass computes predictions, then we calculate a loss (MSE).
+- loss.backward() triggers autodiff, filling W.grad and b.grad with the gradients of the loss with respect to each parameter.
+
+### Machine Learning with AutoDiff
+- ![alt text](image-242.png)
+- Machine Learning can be described as a 4 step process
+- **Forward Pass**: We take our input variables(x) and we flow that input variable into our graph: x => m*x + b => y^(estimate of what y is)
+- the estimate of y is supposed to be quite bad in the forward pass initially(since we selected random values of m and b)
+- In the **second** step, we compare the y^(estimate of y) with the true value y to calculate cost C.
+- Some people also refer to Cost as Loss Function also.
+- ![alt text](image-243.png)
+- Cost function compares y^ with y and gives a quantifiable value of cost value which is an index of how wrong the model is. 
+- Remember our function has 3 parameters: x, m, b. Thay gives us y^
+- Then we compare y^ with y and compute the cost value
+- We have nested functions and we can use chain rule to calculate derivative of these nested functions.
+- In Deep Learning Model we may have thousands of nested functions.
+- In the **third** step, we use the chain rule to calculate the gradient of C with respect to the model parameters.
+- ![alt text](image-244.png)
+- In the **fourth step**, we adjust our parameters 'm' and 'b' to reduce our cost value C (or Loss Function)
+- The way this works is because in step three, when we calculated the gradient or the slope of cost
+with respect to our model parameters, this tells us, this slope tells us whether C is positively or
+negatively related to M and B respectively.
+- So let's say with M, if our cost with respect to M is positive, if the slope is positive, then we
+know that if we were to reduce M somewhat then our cost would reduce as well.
+- And same thing for B, so if cost with respect to B is say negatively related, if there's a negative
+slope, then we know that if we increase B, then that will correspond to a reduction in C.
+- ![alt text](image-245.png)
+- Next we loop through these 4 steps till we reduce our cost function to close to zero. 
+- This will help us get the real values of m and b and we can these use it to make predictions
+
+```python
+# The  y  values were created using the equation of a line  y=mx+b
+
+x = torch.tensor([0, 1, 2, 3, 4, 5, 6, 7.]) # E.g.: Dosage of drug for treating Alzheimer's disease
+x #Output is tensor([0., 1., 2., 3., 4., 5., 6., 7.])
+
+
+# The  y  values were created using the equation of a line  y=mx+b . This way, we 
+# know what the model parameters to be learned are, say,  m=−0.5  and  b=2 . 
+# Random, normally-distributed noise has been added to simulate sampling error:
+
+# y = -0.5*x + 2 + torch.normal(mean=torch.zeros(8), std=0.2)
+
+# For reproducibility of this demo, here's a fixed example of  y  values obtained # by running the commented-out line above:
+y = torch.tensor([1.86, 1.31, .62, .33, .09, -.67, -1.23, -1.37]) # E.g.: Patient's "forgetfulness score"
+y #Output is tensor([ 1.8600,  1.3100,  0.6200,  0.3300,  0.0900, -0.6700, -1.2300, -1.3700])
+
+fig, ax = plt.subplots()
+plt.title("Clinical Trial")
+plt.xlabel("Drug dosage (mL)")
+plt.ylabel("Forgetfulness")
+_ = ax.scatter(x, y)
+
+# Initialize the slope parameter  m  with a "random" value of 0.9...
+# In this simple demo, we could guess approximately-correct parameter values to # start with. Or, we could use an algebraic (e.g., Moore-Penrose pseudoinverse) or # statistical (e.g., ordinary-least-squares regression) to solve for the parameters # quickly. This tiny machine learning demo with two parameters and eight data # points scales, however, to millions of parameters and millions of data points. # The other approaches -- guessing, algebra, statistics -- do not come close to # scaling in this way.)
+
+m = torch.tensor([0.9]).requires_grad_()
+m #Output is tensor([0.9000], requires_grad=True)
+
+b = torch.tensor([0.1]).requires_grad_()
+b #Output is tensor([0.1000], requires_grad=True)
+
+def regression(my_x, my_m, my_b):
+    return my_m*my_x + my_b
+
+def regression_plot(my_x, my_y, my_m, my_b):
+    
+    fig, ax = plt.subplots()
+
+    ax.scatter(my_x, my_y)
+    
+    x_min, x_max = ax.get_xlim()
+    y_min = regression(x_min, my_m, my_b).detach().item()
+    y_max = regression(x_max, my_m, my_b).detach().item()
+    
+    ax.set_xlim([x_min, x_max])
+    _ = ax.plot([x_min, x_max], [y_min, y_max])
+
+
+regression_plot(x, y, m, b) 
+
+# The above line is not so accurate, we will use autodiff to make it try to pass through these points
+
+# Implement Machine Learning in 4 easy steps 
+
+# Step 1 : Forward Pass
+# For each of the 8 x-values, we get the y-values(note: they are not very accurate)
+yhat = regression(x, m, b)
+yhat #Output is tensor([0.1000, 1.0000, 1.9000, 2.8000, 3.7000, 4.6000, 5.5000, 6.4000],grad_fn=<AddBackward0>)
+
+# Step 2 Compare yhat with true y to calculate cost C
+
+# There is a PyTorch MSELoss method, but let's define it outselves to see how it works. MSE cost is defined by:
+# Note that the bigger the difference between y^ and y, the more it gets amplified when we square it. So we are tolerant to small differences between them but the larger differences are highlighted more exponentially increase the cost. Thats why it is called Mean Squared error. Here n = 8
+# C=(1/n)∑i=1n(y^i−yi)^2
+
+def mse(my_yhat, my_y): 
+    sigma = torch.sum((my_yhat - my_y)**2)
+    return sigma/len(my_y)
+
+C = mse(yhat, y)
+C #Output is tensor(19.6755, grad_fn=<DivBackward0>)
+
+
+#Step 3: Use autodiff to calculate gradient of  C  w.r.t. parameters
+C.backward()
+# If slope of C with respect to m or slope of C with respect to b is positive, reduce m and b as we need to move the slope to zero
+m.grad #Output is tensor([36.3050]). Indicates slope/gradient is positive, we need to reduce m
+
+b.grad #Output is tensor([6.2650]). Indicates slope is positive/gradient, we need to reduce b
+
+
+# Step 4: Gradient descent
+# Also called stochastic gradient descent
+# We pass in the list of model parameters we like to adjust as first argument and we also pass the learning rate, which means how much we adjust model parameters ( m and b)
+optimizer = torch.optim.SGD([m, b], lr=0.01)
+
+# Adjust the values of m and b to reduce cost C, Remember m initially was 0.9 and b was 0.1
+optimizer.step()
+
+# Confirm parameters have been adjusted sensibly. Notice that values of m and b are adjusted to a lower value since the slope was positive.
+m #Output is tensor([0.5369], requires_grad=True)
+
+b #Output is tensor([0.0374], requires_grad=True)
+
+regression_plot(x, y, m, b) #Output As we can see it has improved a little bit
+
+# We can repeat steps 1 and 2 to confirm cost has decreased:
+C = mse(regression(x, m, b), y)
+C #Output is tensor(8.5722, grad_fn=<DivBackward0>)
+
+# Put the 4 steps in a loop to iteratively minimize cost toward zero:
+epochs = 1000
+for epoch in range(epochs):
+    
+    optimizer.zero_grad() # Reset gradients to zero; else they accumulate
+    
+    yhat = regression(x, m, b) # Step 1
+    C = mse(yhat, y) # Step 2
+    
+    C.backward() # Step 3
+    optimizer.step() # Step 4
+    
+    print('Epoch {}, cost {}, m grad {}, b grad {}'.format(epoch, '%.3g' % C.item(), '%.3g' % m.grad.item(), '%.3g' % b.grad.item()))
+
+
+```
+- ![alt text](image-246.png)
+- ![alt text](image-247.png)
+- ![alt text](image-248.png)
+- When we run the steps in a loop we get output like this 
+- ![alt text](image-249.png)
+- Notice that as cost decreases, the optimal values of 'm' and 'b' are being calculated.
+- ![alt text](image-250.png)
+- Finally we can plot the line as per optimal values of m and b like this 
+```python
+regression_plot(x, y, m, b)
+
+m.item() #Output is -0.4681258499622345, remember correct value of m was -0.5
+b.item() #Output is 1.7542961835861206, remember correct value of b was 2.0
+
+# however we had added some sampling noise, but notice how close the estimates are. 
+```
+- ![alt text](image-252.png)
+- The model doesn't perfectly approximate the slope (-0.5) and  y -intercept (2.0) used to simulate the outcomes  y  at the top of this notebook. This reflects the imperfectness of the sample of eight data points due to adding random noise during the simulation step. In the real world, the best solution would be to sample additional data points: The more data we sample, the more accurate our estimates of the true underlying parameters will be.
+- Finally we get 
+- 
