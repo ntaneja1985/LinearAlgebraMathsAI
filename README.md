@@ -1668,5 +1668,400 @@ b.item() #Output is 1.7542961835861206, remember correct value of b was 2.0
 ```
 - ![alt text](image-252.png)
 - The model doesn't perfectly approximate the slope (-0.5) and  y -intercept (2.0) used to simulate the outcomes  y  at the top of this notebook. This reflects the imperfectness of the sample of eight data points due to adding random noise during the simulation step. In the real world, the best solution would be to sample additional data points: The more data we sample, the more accurate our estimates of the true underlying parameters will be.
-- Finally we get 
+
+## Partial Derivative Calculus
+- Use gradients in python to enable algorithms to learn from data.
+
+### Review of Introductory Calculus 
+- ![alt text](image-253.png)
+- ![alt text](image-254.png)
+- ![alt text](image-255.png)
+- ![alt text](image-256.png)
+- ![alt text](image-257.png)
+- ![alt text](image-258.png)
+- ![alt text](image-259.png)
+- ![alt text](image-260.png)
+- ![alt text](image-261.png)
+- ![alt text](image-263.png)
+- This section builds upon on the single-variable derivative calculus to introduce gradients and integral calculus. 
+- Gradients of learning, which are facilitated by partial-derivative calculus, are the basis of training most machine learning algorithms with data -- i.e., stochastic gradient descent (SGD). 
+- Paired with the principle of the chain rule (also covered in this class), SGD enables the backpropagation algorithm to train deep neural networks.
+- Integral calculus, meanwhile, comes in handy for myriad tasks associated with machine learning, such as finding the area under the so-called “ROC curve” -- a prevailing metric for evaluating classification models. 
+
+### Partial Derivatives
+- ![alt text](image-264.png)
+
+### Multivariate function 
+- ![alt text](image-265.png)
+- Therefore, we need to calculate partial derivative of m and partial derivative of b. 
+- ![alt text](image-266.png)
+- ![alt text](image-268.png)
+- ![alt text](image-269.png)
+- ![alt text](image-270.png)
+- ![alt text](image-271.png)
+- ![alt text](image-272.png)
+- ![alt text](image-273.png)
+- ![alt text](image-274.png)
+- ![alt text](image-275.png)
+- Determining partial derivatives by hand using rules is helpful for understanding how calculus works. In practice, however, autodiff enables us to do so more easily (especially if there are a large number of variables).
+```python
+# Remember z = x^2 - y^2
+x = torch.tensor(2.).requires_grad_() 
+x #Output is tensor(2., requires_grad=True)
+
+y = torch.tensor(3.).requires_grad_() 
+y #Output is tensor(3., requires_grad=True)
+
+z = f(x, y) # Forward pass
+z #Output is tensor(-5., grad_fn=<SubBackward0>)
+
+z.backward() # Autodiff
+
+x.grad #Output is tensor(4.)(Slope of z with respect to x)
+
+y.grad #Output is tensor(-6.)(Slope of z with respect to y)
+
+```
+### Advanced Partial Derivatives
+- ![alt text](image-276.png)
+- We can prove this using PyTorch as follows:
+```python
+def cylinder_vol(my_r, my_l):
+    return math.pi * my_r**2 * my_l
+
+# Let's say the radius is 3 meters...
+r = torch.tensor(3.).requires_grad_()
+r #Output is tensor(3., requires_grad=True)
+
+# ...and length is 5 meters:
+l = torch.tensor(5.).requires_grad_()
+l#Output is tensor(5., requires_grad=True)
+
+# Then the volume of the cylinder is 141.4 cubic meters: 
+v = cylinder_vol(r, l)
+v #Output is tensor(141.3717, grad_fn=<MulBackward0>)
+
+v.backward()
+
+l.grad #Output is tensor(28.2743)
+
+# Remember that change in length l by 1 unit results in change by pi*r^2
+
+math.pi * 3**2 #Output is 28.274333882308138
+
+# This means that with  value of r being constant at 3, a change in  l  by one unit corresponds to a change in  v  of 28.27 m3 . We can prove this to ourselves:
+
+cylinder_vol(3, 6)
+
+cylinder_vol(3, 6) - cylinder_vol(3, 5)
+# Output is 28.274333882308127
+
+cylinder_vol(3, 7) - cylinder_vol(3, 6)
+# Output is 28.274333882308156
+
+```
+
+- Let us also calculate change with respect to radius also 
+- ![alt text](image-277.png)
+```python
+# For changes in  v  with respect to  r, the volume changes by 2 *pi*r*l
+r.grad #Output is tensor(94.2478)
+2 * math.pi * 3 * 5 #Output is 94.24777960769379
+
+delta = 1e-6
+
+(cylinder_vol(3 + delta, 5) - cylinder_vol(3, 5)) / delta # Dividing by delta restores scale
+#Output is 94.24779531741478
+```
+
+- $r$ is included in the partial derivative so adjusting it affects the scale of its impact on $v$. Although it's our first example in this notebook, it is typical in calculus for the derivative only to apply at an infinitesimally small $\Delta r$. The smaller the $\Delta r$, the closer to the true $\frac{\partial v}{\partial r}$. E.g., at $\Delta r = 1 \times 10^{-6}$:
+- ![alt text](image-278.png)
+- ![alt text](image-279.png)
+- Notice in dz/dx, all other parameters are treated as constant so dz/dx(y^3) = 0;
+- ![alt text](image-280.png)
+- ![alt text](image-281.png)
+
+### Partial Derivative Notation
+- ![alt text](image-282.png)
+
+### Applying Chain Rule to Partial Derivatives
+- ![alt text](image-283.png)
+- ![alt text](image-284.png)
+- ![alt text](image-286.png)
+- ![alt text](image-287.png)
+- ![alt text](image-288.png)
+- ![alt text](image-289.png)
+- ![alt text](image-290.png)
+- ![alt text](image-291.png)
+
+### Point-by-Point Regression
+- Recall the 4 step Machine Learning Loop
+- ![alt text](image-292.png)
+- ![alt text](image-293.png)
+- we calculate the gradient of quadratic cost with respect to a straight-line regression model's parameters. We keep the partial derivatives as simple as possible by limiting the model to handling a single data point.
+```python
+import torch
+xs = torch.tensor([0, 1, 2, 3, 4, 5, 6, 7.])
+ys = torch.tensor([1.86, 1.31, .62, .33, .09, -.67, -1.23, -1.37])
+
+# The slope of a line is given by  y=mx+b :
+def regression(my_x, my_m, my_b):
+    return my_m*my_x + my_b
+
+m = torch.tensor([0.9]).requires_grad_()
+b = torch.tensor([0.1]).requires_grad_()
+
+# To keep the partial derivatives as simple as possible, let's move forward with a single instance  i  from the eight possible data points:
+
+i = 7
+x = xs[i]
+y = ys[i]
+
+# Step 1: Forward pass
+# We can flow the scalar tensor  x  through our regression model to produce  y^ , an estimate of  y . Prior to any model training, this is an arbitrary estimate:
+
+yhat = regression(x, m, b)
+yhat #Output tensor([6.4000], grad_fn=<AddBackward0>)
+
+# Step 2: Compare  y^  with true  y  to calculate cost  C
+# In the Regression in PyTorch notebook, we used mean-squared error, which averages quadratic cost over multiple data points. With a single data point, here we can use quadratic cost alone. It is defined by:C=(y^−y)^2
+def squared_error(my_yhat, my_y):
+    return (my_yhat - my_y)**2
+
+
+C = squared_error(yhat, y)
+C
+# Output is tensor([60.3729], grad_fn=<PowBackward0>)
+
+# Step 3: Use autodiff to calculate gradient of  C  w.r.t. parameters
+C.backward()
+
+# The partial derivative of  C  with respect to  m  ( ∂C/∂m ) is:
+m.grad # Output is tensor([108.7800])
+
+# And the partial derivative of  C  with respect to  b  ( ∂C/∂b ) is:
+b.grad #Output is tensor([15.5400])
+
+```
+### Calculating Quadratic Cost w.r.t Predicted y
+- ![alt text](image-294.png)
+- ![alt text](image-295.png)
+- ![alt text](image-296.png)
+- ![alt text](image-297.png)
+
+### The Gradient of Cost, $\nabla C$
+- The gradient of cost, which is symbolized $\nabla C$ (pronounced "nabla C"), is a vector of all the partial derivatives of $C$ with respect to each of the individual model parameters: 
+- $\nabla C = \nabla_p C = \left[ \frac{\partial{C}}{\partial{p_1}}, \frac{\partial{C}}{\partial{p_2}}, \cdots, \frac{\partial{C}}{\partial{p_n}} \right]^T $
+- In this case, there are only two parameters, $b$ and $m$: 
+- $\nabla C = \left[ \frac{\partial{C}}{\partial{b}}, \frac{\partial{C}}{\partial{m}} \right]^T $
+```python
+gradient = torch.tensor([[b.grad.item(), m.grad.item()]]).T
+gradient
+
+#Output is tensor([[ 15.5400],
+        #[108.7800]])
+```
+### Descending the Gradient of Cost
+- Now we know what the gradient of cost is. Now we will descend the gradient
+- ![alt text](image-298.png)
+- ![alt text](image-299.png)
+- Using partial derivatives, we now know how to calculate the gradient of cost with respect to parameters m and b.
+- In Step 4, we need to descend the Gradient.(Ultimately the gradient of cost(loss function) must descend to 0). We need to adjust parameters(m and b) accordingly.
+- ![alt text](image-300.png)
+
+### Gradient of Cost on a batch of Data
+- let's use mean squared error, which averages quadratic cost across multiple data points: $$C = \frac{1}{n} \sum_{i=1}^n (\hat{y_i}-y_i)^2 $$
+```python
+import torch
+import matplotlib.pyplot as plt
+
+xs = torch.tensor([0, 1, 2, 3, 4, 5, 6, 7.])
+ys = torch.tensor([1.86, 1.31, .62, .33, .09, -.67, -1.23, -1.37])
+
+def regression(my_x, my_m, my_b):
+    return my_m*my_x + my_b
+
+m = torch.tensor([0.9]).requires_grad_()
+b = torch.tensor([0.1]).requires_grad_()
+
+# Step 1: Forward Pass
+yhats = regression(xs, m, b)
+yhats
+
+
+def mse(my_yhat, my_y): 
+    sigma = torch.sum((my_yhat - my_y)**2)
+    return sigma/len(my_y)
+
+# Step 2: Compare yhat with true y to calculate cost C
+C = mse(yhats, ys)
+C
+
+# Step 3: Use autodiff to calculate gradient of  C  w.r.t. parameters
+
+C.backward()
+m.grad
+b.grad
+
+
+gradient = torch.tensor([[b.grad.item(), m.grad.item()]]).T
+gradient
+
+```
+- ![alt text](image-301.png)
+- ![alt text](image-302.png)
+- $$ \frac{\partial C}{\partial m} = \frac{2}{n} \sum (\hat{y}_i - y_i) \cdot x_i $$
+- $$ \frac{\partial C}{\partial b} = \frac{2}{n} \sum (\hat{y}_i - y_i) $$
+```python
+
+# Please note for below output is same as above for m.grad and b.grad
+2*1/len(ys)*torch.sum((yhats - ys)*xs)
+
+2*1/len(ys)*torch.sum(yhats - ys)
+
+```
+- ![alt text](image-303.png)
+- $\frac{\partial C}{\partial m} = 36.3$ indicates that an increase in $m$ corresponds to a large increase in $C$. 
+
+Meanwhile, $\frac{\partial C}{\partial b} = 6.26$ indicates that an increase in $b$ also corresponds to an increase in $C$, though much less so than $m$.
+
+In the first round of training, the lowest hanging fruit with respect to reducing cost $C$ is therefore to decrease the slope of the regression line, $m$. There will also be a relatively small decrease in the $y$-intercept of the line, $b$. 
+
+```python
+optimizer = torch.optim.SGD([m, b], lr=0.01)
+optimizer.step()
+C = mse(regression(xs, m, b), ys)
+```
+- ![alt text](image-304.png)
+- Do Further rounds of training 
+```python
+epochs = 8
+for epoch in range(epochs): 
+    
+    optimizer.zero_grad() # Reset gradients to zero; else they accumulate
+    
+    yhats = regression(xs, m, b) # Step 1
+    C = mse(yhats, ys) # Step 2
+    
+    C.backward() # Step 3
+    
+    labeled_regression_plot(xs, ys, m, b, C)
+    
+    optimizer.step() # Step 4
+
+
+```
+- In later rounds of training, after the model's slope $m$ has become closer to the slope represented by the data, $\frac{\partial C}{\partial b}$ becomes negative, indicating an inverse relationship between $b$ and $C$. Meanwhile, $\frac{\partial C}{\partial m}$ remains positive. 
+
+This combination directs gradient descent to simultaneously adjust the $y$-intercept $b$ upwards and the slope $m$ downwards in order to reduce cost $C$ and, ultimately, fit the regression line snugly to the data. 
+- ![alt text](image-305.png)
+- With almost 1000 epochs of training, we get the following plot:
+- ![alt text](image-307.png)
+
+### Backpropagation
+- ![alt text](image-308.png)
+
+### Higher Order Partial Derivatives
+- ![alt text](image-309.png)
+- Higher Order Partial Derivatives are used in ML to accelerate through gradient descent.
+- ![alt text](image-310.png)
+- 2 types of second order partial derivatives: unmixed and mixed 
+- ![alt text](image-311.png)
+- ![alt text](image-312.png)
+- ![alt text](image-313.png)
+- Higher-order partial derivatives—those beyond the first derivative, like second (Hessians), third, or more—play a subtle but powerful role in machine learning. They’re not as front-and-center as first-order gradients (used in basic gradient descent), but they pop up in specific algorithms and scenarios where understanding curvature or higher-level behavior of the loss function gives you an edge.
+- Optimization: Understanding Curvature with Second-Order Derivatives
+- What They Are: The second partial derivatives form the Hessian matrix, which describes the local curvature of the loss function in multidimensional space.
+- Use in ML: They help optimization algorithms go beyond the “slope” (first gradient) to understand how fast the slope changes—crucial for navigating tricky loss landscapes.
+- Example: Newton’s Method and Quasi-Newton methods (like BFGS) use the Hessian (or approximations) to adjust step sizes and directions more intelligently than plain gradient descent. In a neural network, this can mean faster convergence by accounting for how parameters interact.
+- Why It Matters: First-order methods (e.g., SGD) can zigzag or stall in flat regions or near saddle points. Second-order info helps “see” the terrain better, jumping over obstacles.
+- Practical Catch: Computing the full Hessian is expensive—O(n²) storage and computation for n parameters—so it’s rare in deep learning with millions of parameters. Approximations (e.g., diagonal Hessian) or limited-memory methods (L-BFGS) are more common.
+- In short, higher-order partial derivatives give ML a deeper view of the optimization problem—curvature, stability, uncertainty—at the cost of complexity. They’re like a high-powered lens: not always needed, but invaluable when precision matters.
+- ![alt text](image-314.png)
+
+## Integral Calculus
+- ![alt text](image-315.png)
+- ![alt text](image-316.png)
+- ![alt text](image-317.png)
+### Confusion Matrix
+- A confusion matrix is a tool used in machine learning to evaluate the performance of a classification model by breaking down its predictions into a table. It shows how often the model’s predictions match the actual labels, giving you a clear picture of where it’s succeeding or screwing up. Think of it as a scorecard for your classifier—especially useful when you’re dealing with categories like “spam vs. not spam” or “cat vs. dog vs. bird.”
+- It's called this because it's a matrix of when someone or an algorithm is confused as opposed to the
+user of the matrix.
+- It's more for logging.
+- When some process leads to mistakes, including when an algorithm makes mistakes.
+- For a binary classification problem (e.g., Positive vs. Negative), the confusion matrix is a 2x2 table:
+- ![alt text](image-318.png)
+
+### Receiver Operating Characteristic(ROC) curve
+- It's an enormously useful metric for quantifying the performance of a binary classification model.
+- Consider we have a binary classification algorithm to predict if there is a hotdog in an image or not. y corresponds to the actual outputs and y^ corresponds to the predictions made by the algorithm.
+- ![alt text](image-319.png)
+- Anything less than threshold is considered to be 0(not a hotdog) and above it is 1(it is a hotdog)
+- ![alt text](image-322.png)
+- ![alt text](image-323.png)
+- The above is an ROC-AUC curve.
+- Our objective is to have an algorithm that fills as much of the space under this curve as possible.
+- So with our made up data points, our model currently has a area under the curve of 0.75, so we can
+say an Roc, AUC, a receiver operating characteristic area under the curve of 0.75 now is 0.75.
+- Is 0.75 good ?
+- ![alt text](image-324.png)
+- An ROC curve (Receiver Operating Characteristic curve) foundational questions about machine learningcurve) is a graphical tool used in machine learning to evaluate the performance of a binary classification model. It plots the trade-off between the model’s ability to correctly identify positive cases (True Positive Rate) versus its tendency to incorrectly label negative cases as positive (False Positive Rate) across different decision thresholds. It’s a go-to for understanding how well your classifier separates classes—like spam vs. not spam or disease vs. no disease—beyond a single accuracy score.
+
+### Integral Calculus
+- Study of areas under curves
+- Facilitates the inverse of differential calculus.
+- ![alt text](image-326.png)
+- ![alt text](image-327.png)
+- At a high level, how does integral calculus work?
+- Much like differential calculus, it has to do with this idea of approaching infinity in some way.
+- In the case of integral calculus, we use slices that correspond to rectangular area underneath a
+curve.
+- As the width of those slices approaches an infinitely small width that allows us to find the area
+under the entirety of the curve.
+- ![alt text](image-328.png)
+- ![alt text](image-329.png)
+- ![alt text](image-330.png)
+- ![alt text](image-331.png)
+- ![alt text](image-332.png)
+- ![alt text](image-333.png)
+- ![alt text](image-334.png)
+
+### Definite Integrals
+- Definite integral is not interested in entire area under curve but is interested in a specific area in the curve
+- ![alt text](image-335.png)
+- ![alt text](image-337.png)
+- From the slides: $$ \int_1^2 \frac{x}{2} dx = \frac{3}{4} $$
+```python
+from scipy.integrate import quad # "quadrature" = numerical integration (as opposed to symbolic)
+def g(x):
+    return x/2
+quad(g, 1, 2) #Output is (0.75, 8.326672684688674e-15)
+# The second output of quad is an estimate of the absolute error of the integral, which in this case is essentially zero.
+
+def h(x):
+    return 2*x
+
+quad(h, 3, 4) #Output is (7.0, 7.771561172376096e-14)
+
+```
+- ![alt text](image-338.png)
+
+
+### Area undere ROC curve
+- ![alt text](image-339.png)
+
+```python
+# When we don't have a function but we do have  (x,y)  coordinates, we can use the scikit-learn library's auc() method, which uses a numerical approach (the trapezoidal rule) to find the area under the curve described by the coordinates:
+
+from sklearn.metrics import auc
+
+# From the slides, the  (x,y)  coordinates of our hot dog-detecting ROC curve are:
+xs = [0, 0,   0.5, 0.5, 1]
+ys = [0, 0.5, 0.5, 1,   1]
+
+auc(xs, ys) #Output is np.float64(0.75)
+
+
+```
+- ![alt text](image-340.png)
 - 
