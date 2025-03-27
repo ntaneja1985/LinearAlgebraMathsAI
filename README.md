@@ -2077,61 +2077,70 @@ auc(xs, ys) #Output is np.float64(0.75)
 - ![alt text](image-344.png)
 
 ### Events and Sample Spaces
+
 - Let's assume we have a fair coin, which is equally likely to come up heads (H) or tails (T).
 - In instances like this, where the two outcomes are equally likely, we can use probability theory to express the likelihood of a particular **event** by comparing it with the **sample space** (the set of all possible outcomes; can be denoted as $\Omega$):
 - $$ P(\text{event}) = \frac{\text{# of outcomes of event}}{\text{# of outcomes in }\Omega} $$
-- If we're only flipping the coin once, then there are only two possible outcomes in the sample space $\Omega$: it will either be H or T (using set notation, we could write this as $\Omega$ = {H, T}).
+- If we're only flipping the coin once, then there are only two possible outcomes in the sample space $\Omega$: it will either be H or T (using set notation, we could write this as $\Omega = \{H, T\}$).
 - Therefore: $$ P(H) = \frac{1}{2} = 0.5 $$
 - Equally: $$ P(T) = \frac{1}{2} = 0.5 $$
 - As a separate example, consider drawing a single card from a standard deck of 52 playing cards. In this case, the number of possible outcomes in the sample space $\Omega$ is 52.
 - There is only one ace of spades in the deck, so the probability of drawing it is: $$ P(\text{ace of spades}) = \frac{1}{52} \approx 0.019 $$
-- In contrast there are four aces, so the probability of drawing an ace is: $$ P(\text{ace}) = \frac{4}{52} \approx 0.077 $$
+- In contrast, there are four aces, so the probability of drawing an ace is: $$ P(\text{ace}) = \frac{4}{52} \approx 0.077 $$
 - Some additional examples:
-$$ P(\text{spade}) = \frac{13}{52} = 0.25 $$
-$$ P(\text{ace OR spade}) = \frac{16}{52} \approx 0.307 $$
-$$ P(\text{card}) = \frac{52}{52} = 1 $$
-$$ P(\text{turnip}) = \frac{0}{52} = 0 $$
+  - $$ P(\text{spade}) = \frac{13}{52} = 0.25 $$
+  - $$ P(\text{ace OR spade}) = \frac{16}{52} \approx 0.307 $$
+  - $$ P(\text{card}) = \frac{52}{52} = 1 $$
+  - $$ P(\text{turnip}) = \frac{0}{52} = 0 $$
 
-### Multiple Independent Observations
-- Let's return to coin flipping to illustrate situations where we have an event consisting of multiple independent observations. For example, the probability of throwing two consecutive heads is: $$ P(\text{HH}) = \frac{1}{4} = 0.25 $$ ...because there is one HH event in the sample set of four possible events ($\Omega$ = {HH, HT, TH, TT}).
-- Likewise, the probability of throwing *three* consecutive heads is: $$ P(\text{HHH}) = \frac{1}{8} = 0.125 $$ ...because there is one HHH event in the sample set of eight possible events ($\Omega$ = {HHH, HHT, HTH, THH, HTT, THT, TTH, TTT}).
-- As final examples, the probability of throwing exactly two heads in three tosses is $ P = \frac{3}{8} = 0.375 $ while the probability of throwing at least two heads in three tosses is $ P = \frac{4}{8} = 0.5 $.
-- As final examples, the probability of throwing exactly two heads in three tosses is $ P = \frac{3}{8} = 0.375 $ while the probability of throwing at least two heads in three tosses is $ P = \frac{4}{8} = 0.5 $.
+## Multiple Independent Observations
+
+- Let's return to coin flipping to illustrate situations where we have an event consisting of multiple independent observations. For example, the probability of throwing two consecutive heads is: $$ P(\text{HH}) = \frac{1}{4} = 0.25 $$ ...because there is one HH event in the sample set of four possible events ($\Omega = \{HH, HT, TH, TT\}$).
+- Likewise, the probability of throwing *three* consecutive heads is: $$ P(\text{HHH}) = \frac{1}{8} = 0.125 $$ ...because there is one HHH event in the sample set of eight possible events ($\Omega = \{HHH, HHT, HTH, THH, HTT, THT, TTH, TTT\}$).
+- As final examples, the probability of throwing exactly two heads in three tosses is $$ P = \frac{3}{8} = 0.375 $$ while the probability of throwing at least two heads in three tosses is $$ P = \frac{4}{8} = 0.5 $$.
 - In order to combine probabilities, we can multiply them. So the probability of throwing five consecutive heads, for example, is the product of probabilities we've already calculated: $$ P(\text{HHHHH}) = P(\text{HH}) \times P(\text{HHH}) = \frac{1}{4} \times \frac{1}{8} = \frac{1}{32} \approx 0.031 $$
 
-### Combinatorics
+## Combinatorics
+
 - Combinatorics is a field of mathematics devoted to counting, and it can be helpful for studying probabilities.
 - We can use **factorials** (e.g., $4! = 4 \times 3 \times 2 \times 1 = 24$), which feature prominently in combinatorics, to calculate probabilities instead of painstakingly determining all of the members of the sample space $\Omega$ and counting subsets within $\Omega$.
 - More specifically, we can calculate the number of outcomes of an event using the "number of combinations" equation: $$ {n \choose k} = \frac{n!}{k!(n - k)!} $$
 - The left-hand side of the equation is read "$n$ choose $k$" and is most quickly understood via an example: If we have three coin flips, $n = 3$, and if we're interested in the number of ways to get two head flips (or two tail flips, for that matter), $k = 2$. We would read this as "3 choose 2" and calculate it as:
-$$ {n \choose k} = {3 \choose 2} = \frac{3!}{2!(3 - 2)!} = \frac{3!}{(2!)(1!)} = \frac{3 \times 2 \times 1}{(2 \times 1)(1)} = \frac{6}{(2)(1)} = \frac{6}{2} = 3 $$
-- This provide us with the numerator for event-probability equation from above: $$ P(\text{event}) = \frac{\text{# of outcomes of event}}{\text{# of outcomes in }\Omega} $$
+  - $$ {n \choose k} = {3 \choose 2} = \frac{3!}{2!(3 - 2)!} = \frac{3!}{(2!)(1!)} = \frac{3 \times 2 \times 1}{(2 \times 1)(1)} = \frac{6}{(2)(1)} = \frac{6}{2} = 3 $$
+- This provides us with the numerator for the event-probability equation from above: $$ P(\text{event}) = \frac{\text{# of outcomes of event}}{\text{# of outcomes in }\Omega} $$
 - In the case of coin-flipping (or any binary process with equally probable outcomes), the denominator can be calculated with $2^n$ (where $n$ is again the number of coin flips), so: $$ \frac{\text{# of outcomes of event}}{\text{# of outcomes in }\Omega} = \frac{3}{2^n} = \frac{3}{2^3} = \frac{3}{8} = 0.375 $$
 
 ## Probability Exercises
-- **Exercises**:
+
+### Exercises
 
 1. What is the probability of drawing the ace of spades twice in a row? (Assume that any card drawn on the first draw will be put back in the deck before the second draw.)
 2. You draw a card from a deck of cards. After replacing the drawn card back in the deck and shuffling thoroughly, what is the probability of drawing the same card again?
 3. Use $n \choose k$ to calculate the probability of throwing three heads in five coin tosses.
 4. Create a Python method that solves exercise 3 and incorporates the $n \choose k$ formula $\frac{n!}{k!(n - k)!}$. With the method in hand, calculate the probability of -- in five tosses -- throwing each of zero, one, two, three, four, and five heads.
 
-- Solutions
+### Solutions
+
 1. $$ P(\text{ace of spades}) \times P(\text{ace of spades}) = \left(\frac{1}{52}\right)^2 = \frac{1}{2704} = 0.00037 = 0.037\% $$
 2. $$ P(\text{any card}) = \frac{52}{52} = 1 $$
-$$ P(\text{same card as first draw}) = \frac{1}{52} \approx 0.019 $$
-$$ P(\text{any card})P(\text{same card as first draw}) = (1)(\frac{1}{52}) = \frac{1}{52} \approx 0.019$$
+   $$ P(\text{same card as first draw}) = \frac{1}{52} \approx 0.019 $$
+   $$ P(\text{any card})P(\text{same card as first draw}) = (1)\left(\frac{1}{52}\right) = \frac{1}{52} \approx 0.019 $$
 3. $$ {n \choose k} = {5 \choose 3} = \frac{5!}{3!(5 - 3)!} = \frac{5!}{(3!)(2!)} = \frac{5 \times 4 \times 3 \times 2 \times 1}{(3 \times 2 \times 1)(2 \times 1)} = \frac{120}{(6)(2)} = \frac{120}{12} = 10 $$
-- $$P = \frac{10}{2^n} = \frac{10}{2^5} = \frac{10}{32} = 0.3125 $$
-  4. Please see below
+   $$ P = \frac{10}{2^n} = \frac{10}{2^5} = \frac{10}{32} = 0.3125 $$
+4. See the Python code below:
 
 ```python
 from math import factorial
+
 def coinflip_prob(n, k):
-    n_choose_k = factorial(n)/(factorial(k)*factorial(n-k))
-    return n_choose_k/2**n
-coinflip_prob(5, 3)
+    n_choose_k = factorial(n) / (factorial(k) * factorial(n - k))
+    return n_choose_k / 2**n
 
-[coinflip_prob(5, h) for h in range(6)]
+# Probability of 3 heads in 5 tosses
+print(coinflip_prob(5, 3))  # Output: 0.3125
 
+# Probabilities for 0 to 5 heads in 5 tosses
+probabilities = [coinflip_prob(5, h) for h in range(6)]
+print(probabilities)
+# Output: [0.03125, 0.15625, 0.3125, 0.3125, 0.15625, 0.03125]
 ```
