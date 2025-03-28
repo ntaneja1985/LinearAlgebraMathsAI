@@ -2076,58 +2076,62 @@ auc(xs, ys) #Output is np.float64(0.75)
 - Expressed over a range of 0(will not happen) to 1 (will happen)
 - ![alt text](image-344.png)
 
-### Events and Sample Spaces
+<h3>Events and Sample Spaces</h3>
 
-  Let's assume we have a fair coin, which is equally likely to come up heads (H) or tails (T).
-  In instances like this, where the two outcomes are equally likely, we can use probability theory to express the likelihood of a particular **event** by comparing it with the **sample space** (the set of all possible outcomes; can be denoted as $\Omega$):
-  $$ P(\text{event}) = \frac{\text{# of outcomes of event}}{\text{# of outcomes in }\Omega} $$
-  If we're only flipping the coin once, then there are only two possible outcomes in the sample space $\Omega$: it will either be H or T (using set notation, we could write this as $\Omega = \{H, T\}$).
-  Therefore: $$ P(H) = \frac{1}{2} = 0.5 $$
-  Equally: $$ P(T) = \frac{1}{2} = 0.5 $$
-  As a separate example, consider drawing a single card from a standard deck of 52 playing cards. In this case, the number of possible outcomes in the sample space $\Omega$ is 52.
-  There is only one ace of spades in the deck, so the probability of drawing it is: $$ P(\text{ace of spades}) = \frac{1}{52} \approx 0.019 $$
-  In contrast, there are four aces, so the probability of drawing an ace is: $$ P(\text{ace}) = \frac{4}{52} \approx 0.077 $$
- Some additional examples:
-   $$ P(\text{spade}) = \frac{13}{52} = 0.25 $$
-   $$ P(\text{ace OR spade}) = \frac{16}{52} \approx 0.307 $$
-   $$ P(\text{card}) = \frac{52}{52} = 1 $$
-   $$ P(\text{turnip}) = \frac{0}{52} = 0 $$
+<p>Let's assume we have a fair coin, which is equally likely to come up heads (H) or tails (T).</p>
+<p>In instances like this, where the two outcomes are equally likely, we can use probability theory to express the likelihood of a particular <strong>event</strong> by comparing it with the <strong>sample space</strong> (the set of all possible outcomes; can be denoted as Ω):</p>
+<p>P(event) = <sup># of outcomes of event</sup>⁄<sub># of outcomes in Ω</sub></p>
+<p>If we're only flipping the coin once, then there are only two possible outcomes in the sample space Ω: it will either be H or T (using set notation, we could write this as Ω = {H, T}).</p>
+<p>Therefore: P(H) = <sup>1</sup>⁄<sub>2</sub> = 0.5</p>
+<p>Equally: P(T) = <sup>1</sup>⁄<sub>2</sub> = 0.5</p>
+<p>As a separate example, consider drawing a single card from a standard deck of 52 playing cards. In this case, the number of possible outcomes in the sample space Ω is 52.</p>
+<p>There is only one ace of spades in the deck, so the probability of drawing it is: P(ace of spades) = <sup>1</sup>⁄<sub>52</sub> ≈ 0.019</p>
+<p>In contrast, there are four aces, so the probability of drawing an ace is: P(ace) = <sup>4</sup>⁄<sub>52</sub> ≈ 0.077</p>
+<p>Some additional examples:</p>
+<ul>
+  <li>P(spade) = <sup>13</sup>⁄<sub>52</sub> = 0.25</li>
+  <li>P(ace OR spade) = <sup>16</sup>⁄<sub>52</sub> ≈ 0.307</li>
+  <li>P(card) = <sup>52</sup>⁄<sub>52</sub> = 1</li>
+  <li>P(turnip) = <sup>0</sup>⁄<sub>52</sub> = 0</li>
+</ul>
 
-## Multiple Independent Observations
+<h2>Multiple Independent Observations</h2>
 
-  Let's return to coin flipping to illustrate situations where we have an event consisting of multiple independent observations. For example, the probability of throwing two consecutive heads is: $$ P(\text{HH}) = \frac{1}{4} = 0.25 $$ ...because there is one HH event in the sample set of four possible events ($\Omega = \{HH, HT, TH, TT\}$).
-  Likewise, the probability of throwing *three* consecutive heads is: $$ P(\text{HHH}) = \frac{1}{8} = 0.125 $$ ...because there is one HHH event in the sample set of eight possible events ($\Omega = \{HHH, HHT, HTH, THH, HTT, THT, TTH, TTT\}$).
-  As final examples, the probability of throwing exactly two heads in three tosses is $$ P = \frac{3}{8} = 0.375 $$ while the probability of throwing at least two heads in three tosses is $$ P = \frac{4}{8} = 0.5 $$.
-  In order to combine probabilities, we can multiply them. So the probability of throwing five consecutive heads, for example, is the product of probabilities we've already calculated: $$ P(\text{HHHHH}) = P(\text{HH}) \times P(\text{HHH}) = \frac{1}{4} \times \frac{1}{8} = \frac{1}{32} \approx 0.031 $$
+<p>Let's return to coin flipping to illustrate situations where we have an event consisting of multiple independent observations. For example, the probability of throwing two consecutive heads is: P(HH) = <sup>1</sup>⁄<sub>4</sub> = 0.25 ...because there is one HH event in the sample set of four possible events (Ω = {HH, HT, TH, TT}).</p>
+<p>Likewise, the probability of throwing <em>three</em> consecutive heads is: P(HHH) = <sup>1</sup>⁄<sub>8</sub> = 0.125 ...because there is one HHH event in the sample set of eight possible events (Ω = {HHH, HHT, HTH, THH, HTT, THT, TTH, TTT}).</p>
+<p>As final examples, the probability of throwing exactly two heads in three tosses is P = <sup>3</sup>⁄<sub>8</sub> = 0.375 while the probability of throwing at least two heads in three tosses is P = <sup>4</sup>⁄<sub>8</sub> = 0.5.</p>
+<p>In order to combine probabilities, we can multiply them. So the probability of throwing five consecutive heads, for example, is the product of probabilities we've already calculated: P(HHHHH) = P(HH) × P(HHH) = <sup>1</sup>⁄<sub>4</sub> × <sup>1</sup>⁄<sub>8</sub> = <sup>1</sup>⁄<sub>32</sub> ≈ 0.031</p>
 
-## Combinatorics
+<h2>Combinatorics</h2>
 
-Combinatorics is a field of mathematics devoted to counting, and it can be helpful for studying probabilities.
- We can use **factorials** (e.g., $4! = 4 \times 3 \times 2 \times 1 = 24$), which feature prominently in combinatorics, to calculate probabilities instead of painstakingly determining all of the members of the sample space $\Omega$ and counting subsets within $\Omega$.
-  More specifically, we can calculate the number of outcomes of an event using the "number of combinations" equation: $$ {n \choose k} = \frac{n!}{k!(n - k)!} $$
- The left-hand side of the equation is read "$n$ choose $k$" and is most quickly understood via an example: If we have three coin flips, $n = 3$, and if we're interested in the number of ways to get two head flips (or two tail flips, for that matter), $k = 2$. We would read this as "3 choose 2" and calculate it as:
-  $$ {n \choose k} = {3 \choose 2} = \frac{3!}{2!(3 - 2)!} = \frac{3!}{(2!)(1!)} = \frac{3 \times 2 \times 1}{(2 \times 1)(1)} = \frac{6}{(2)(1)} = \frac{6}{2} = 3 $$
-  This provides us with the numerator for the event-probability equation from above: $$ P(\text{event}) = \frac{\text{# of outcomes of event}}{\text{# of outcomes in }\Omega} $$
-  In the case of coin-flipping (or any binary process with equally probable outcomes), the denominator can be calculated with $2^n$ (where $n$ is again the number of coin flips), so: $$ \frac{\text{# of outcomes of event}}{\text{# of outcomes in }\Omega} = \frac{3}{2^n} = \frac{3}{2^3} = \frac{3}{8} = 0.375 $$
+<p>Combinatorics is a field of mathematics devoted to counting, and it can be helpful for studying probabilities.</p>
+<p>We can use <strong>factorials</strong> (e.g., 4! = 4 × 3 × 2 × 1 = 24), which feature prominently in combinatorics, to calculate probabilities instead of painstakingly determining all of the members of the sample space Ω and counting subsets within Ω.</p>
+<p>More specifically, we can calculate the number of outcomes of an event using the "number of combinations" equation: <sup>n!</sup>⁄<sub>k!(n - k)!</sub></p>
+<p>The expression is read "n choose k" and is most quickly understood via an example: If we have three coin flips, n = 3, and if we're interested in the number of ways to get two head flips (or two tail flips, for that matter), k = 2. We would read this as "3 choose 2" and calculate it as:</p>
+<p><sup>3!</sup>⁄<sub>2!(3 - 2)!</sub> = <sup>3!</sup>⁄<sub>(2!)(1!)</sub> = <sup>3 × 2 × 1</sup>⁄<sub>(2 × 1)(1)</sub> = <sup>6</sup>⁄<sub>(2)(1)</sub> = <sup>6</sup>⁄<sub>2</sub> = 3</p>
+<p>This provides us with the numerator for the event-probability equation from above: P(event) = <sup># of outcomes of event</sup>⁄<sub># of outcomes in Ω</sub></p>
+<p>In the case of coin-flipping (or any binary process with equally probable outcomes), the denominator can be calculated with 2<sup>n</sup> (where n is again the number of coin flips), so: <sup>3</sup>⁄<sub>2<sup>n</sup></sub> = <sup>3</sup>⁄<sub>2<sup>3</sup></sub> = <sup>3</sup>⁄<sub>8</sub> = 0.375</p>
 
-## Probability Exercises
+<h2>Probability Exercises</h2>
 
-### Exercises
+<h3>Exercises</h3>
 
-1. What is the probability of drawing the ace of spades twice in a row? (Assume that any card drawn on the first draw will be put back in the deck before the second draw.)
-2. You draw a card from a deck of cards. After replacing the drawn card back in the deck and shuffling thoroughly, what is the probability of drawing the same card again?
-3. Use $n \choose k$ to calculate the probability of throwing three heads in five coin tosses.
-4. Create a Python method that solves exercise 3 and incorporates the $n \choose k$ formula $\frac{n!}{k!(n - k)!}$. With the method in hand, calculate the probability of -- in five tosses -- throwing each of zero, one, two, three, four, and five heads.
+<ol>
+  <li>What is the probability of drawing the ace of spades twice in a row? (Assume that any card drawn on the first draw will be put back in the deck before the second draw.)</li>
+  <li>You draw a card from a deck of cards. After replacing the drawn card back in the deck and shuffling thoroughly, what is the probability of drawing the same card again?</li>
+  <li>Use "n choose k" to calculate the probability of throwing three heads in five coin tosses.</li>
+  <li>Create a Python method that solves exercise 3 and incorporates the "n choose k" formula <sup>n!</sup>⁄<sub>k!(n - k)!</sub>. With the method in hand, calculate the probability of -- in five tosses -- throwing each of zero, one, two, three, four, and five heads.</li>
+</ol>
 
-### Solutions
+<h3>Solutions</h3>
 
-   $$ P(\text{ace of spades}) \times P(\text{ace of spades}) = \left(\frac{1}{52}\right)^2 = \frac{1}{2704} = 0.00037 = 0.037\% $$
-   $$ P(\text{any card}) = \frac{52}{52} = 1 $$
-   $$ P(\text{same card as first draw}) = \frac{1}{52} \approx 0.019 $$
-   $$ P(\text{any card})P(\text{same card as first draw}) = (1)\left(\frac{1}{52}\right) = \frac{1}{52} \approx 0.019 $$
-   $$ {n \choose k} = {5 \choose 3} = \frac{5!}{3!(5 - 3)!} = \frac{5!}{(3!)(2!)} = \frac{5 \times 4 \times 3 \times 2 \times 1}{(3 \times 2 \times 1)(2 \times 1)} = \frac{120}{(6)(2)} = \frac{120}{12} = 10 $$
-   $$ P = \frac{10}{2^n} = \frac{10}{2^5} = \frac{10}{32} = 0.3125 $$
- See the Python code below:
+<p>P(ace of spades) × P(ace of spades) = (<sup>1</sup>⁄<sub>52</sub>)<sup>2</sup> = <sup>1</sup>⁄<sub>2704</sub> = 0.00037 = 0.037%</p>
+<p>P(any card) = <sup>52</sup>⁄<sub>52</sub> = 1</p>
+<p>P(same card as first draw) = <sup>1</sup>⁄<sub>52</sub> ≈ 0.019</p>
+<p>P(any card)P(same card as first draw) = (1)(<sup>1</sup>⁄<sub>52</sub>) = <sup>1</sup>⁄<sub>52</sub> ≈ 0.019</p>
+<p><sup>5!</sup>⁄<sub>3!(5 - 3)!</sub> = <sup>5!</sup>⁄<sub>(3!)(2!)</sub> = <sup>5 × 4 × 3 × 2 × 1</sup>⁄<sub>(3 × 2 × 1)(2 × 1)</sub> = <sup>120</sup>⁄<sub>(6)(2)</sub> = <sup>120</sup>⁄<sub>12</sub> = 10</p>
+<p>P = <sup>10</sup>⁄<sub>2<sup>5</sup></sub> = <sup>10</sup>⁄<sub>32</sub> = 0.3125</p>
+<p>See the Python code below:</p>
 
 ```python
 from math import factorial
